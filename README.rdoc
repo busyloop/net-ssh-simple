@@ -1,0 +1,44 @@
+= Net::SSH::Simple
+
+Net::SSH::Simple is a simple wrapper around Net::SSH and Net::SCP.
+
+== Installation
+
+ gem install net-ssh-simple
+
+== Examples
+
+=== Block Syntax (synchronous)
+ Net::SSH::Simple.sync do
+   r = ssh 'example1.com', 'echo "Hello World."'
+   puts r.stdout #=> "Hello World."
+
+   scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
+   scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
+ end
+
+=== Block Syntax (asynchronous)
+ a = Net::SSH::Simple.async do
+   ssh    'example1.com', 'echo "Hello World."'
+   scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
+   scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
+ end
+ b = Net::SSH::Simple.async do
+   ssh    'example4.com', 'echo "Hello World."'
+   scp_ul 'example5.com', '/tmp/local_foo', '/tmp/remote_bar'
+   scp_dl 'example6.com', '/tmp/remote_foo', '/tmp/local_bar'
+ end
+ a.value # Wait for thread A to finish and capture result
+ b.value # Wait for thread B to finish and capture result
+
+=== Using an instance
+ s = Net::SSH::Simple.new
+ s.ssh    'example1.com', 'echo "Hello World."'
+ s.scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
+ s.scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
+ s.close
+ 
+== Documentation
+
+See {Net::SSH::Simple}[http://rubydoc.info/gems/net-ssh-simple/Net/SSH/Simple] for more examples and full API.
+
