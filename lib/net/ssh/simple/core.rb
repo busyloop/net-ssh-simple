@@ -139,7 +139,7 @@ module Net
       include Blockenspiel::DSL
 
       #
-      # Result of a Net::SSH::Simple::Operation.
+      # Result of the current Net::SSH::Simple::Operation.
       #
       # @return [Net::SSH::Simple::Result] Result of the current operation
       attr_reader :result
@@ -205,6 +205,7 @@ module Net
       # @param (see Net::SSH::Simple#scp_dl)
       # @raise [Net::SSH::Simple::Error]
       # @return [Net::SSH::Simple::Result] Result
+      #
       def self.scp_dl(*args, &block)
         s = self.new
         r = s.scp_dl(*args, &block)
@@ -469,8 +470,7 @@ module Net
       end
 
       #
-      # Encapsulates any Errors that may occur
-      # during a Net::SSH::Simple operation.
+      # Error that occured during a Net::SSH::Simple operation.
       #
       class Error < RuntimeError
         # Reference to the underlying Net::SSH Exception
@@ -492,8 +492,18 @@ module Net
       #
       # Result of a Net::SSH::Simple operation.
       #
-      # This Mash contains various information that may
-      # be relevant to your interests.
+      # @attr [String] host Hostname/IP address
+      # @attr [String] cmd Shell command (SSH only)
+      # @attr [Time] start_at Operation start timestamp
+      # @attr [Time] finish_at Operation finish timestamp
+      # @attr [String] stdout Output to stdout (SSH only)
+      # @attr [String] stderr Output to stderr (SSH only)
+      # @attr [boolean] success
+      # @attr [String] exit_code UNIX exit code of the remote command (SSH only)
+      # @attr [Integer] total Size of requested file (in bytes, SCP only)
+      # @attr [Integer] sent Number of bytes transferred (SCP only)
+      # @attr [String] exit_signal
+      #   Only present if the remote command terminates due to a signal (SSH only)
       #
       class Result < Hashie::Mash; end
     end
