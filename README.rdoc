@@ -19,6 +19,8 @@ Net::SSH::Simple is a simple wrapper around Net::SSH and Net::SCP.
 
 === Block Syntax (synchronous)
 
+ require 'net/ssh/simple'
+
  Net::SSH::Simple.sync do
    r = ssh 'example1.com', 'echo "Hello World."'
    puts r.stdout #=> "Hello World."
@@ -28,6 +30,8 @@ Net::SSH::Simple is a simple wrapper around Net::SSH and Net::SCP.
  end
 
 === Block Syntax (asynchronous)
+
+ require 'net/ssh/simple'
 
  a = Net::SSH::Simple.async do
    ssh    'example1.com', 'echo "Hello World."'
@@ -43,6 +47,9 @@ Net::SSH::Simple is a simple wrapper around Net::SSH and Net::SCP.
  b.value # Wait for thread B to finish and capture result
 
 === Using an instance
+
+ require 'net/ssh/simple'
+
  s = Net::SSH::Simple.new
  s.ssh    'example1.com', 'echo "Hello World."'
  s.scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
