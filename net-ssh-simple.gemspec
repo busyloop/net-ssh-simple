@@ -11,14 +11,14 @@ Gem::Specification.new do |s|
   s.description = %q{Net::SSH::Simple is a simple wrapper around Net::SSH and Net::SCP.}
   s.summary     = %q{SSH without the headache}
 
-  s.rubyforge_project = "net-ssh-simple"
+  s.required_ruby_version = '>= 1.9.2'
   
   s.add_dependency "net-ssh", "~> 2.1.4"
   s.add_dependency "net-scp", "~> 1.0.4"
   s.add_dependency "blockenspiel", "~> 0.4.3"
   s.add_dependency "hashie", "~> 1.1.0"
 
-  s.add_development_dependency "rake"
+  s.add_development_dependency "rake", "~> 0.9.2.2"
   s.add_development_dependency "rspec"
   s.add_development_dependency "cover_me"
 

@@ -5,3 +5,4 @@ pkg/*
 .yardoc
 coverage.data
 coverage
+sync

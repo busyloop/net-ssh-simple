@@ -1,3 +1,4 @@
+require 'timeout'
 module Net
   module SSH
     # Net::SSH::Simple is a simple wrapper around Net::SSH and Net::SCP.
@@ -229,9 +230,9 @@ module Net
       # @param (see Net::SSH::Simple#ssh)
       # @raise [Net::SSH::Simple::Error]
       # @return [Net::SSH::Simple::Result] Result
-      def self.ssh(*args)
+      def self.ssh(*args, &block)
         s = self.new
-        r = s.ssh(*args)
+        r = s.ssh(*args, &block)
         s.close
         r
       end
@@ -500,9 +501,9 @@ module Net
       # @return [Net::SSH::Simple::Result] Result
       #
       def self.sync(&block)
-        b = self.new
-        r = Blockenspiel.invoke(block, b)
-        b.close
+        s = self.new
+        r = Blockenspiel.invoke(block, s)
+        s.close
         r
       end
 
@@ -519,15 +520,20 @@ module Net
       end
 
       private
-      def with_session(host, opts, &block)
+      def with_session(host, opts={:timeout => 60}, &block)
         begin
-          session = @sessions[host.hash] = @sessions[host.hash] ||\
-            Net::SSH.start(*[host, opts[:user], opts])
-          block.call(session)
+          Timeout.timeout(opts[:timeout]) do
+            session = @sessions[host.hash] = @sessions[host.hash] ||\
+              Net::SSH.start(*[host, opts[:user], opts])
+            block.call(session)
+          end
         rescue => e
           opts[:password].gsub!(/./,'*') if opts.include? :password
           @result[:exception] = e
           @result[:context] = [host,opts]
+          @result[:success] = false
+          @result[:timed_out] = true
+          @result[:finish_at] = Time.new
           raise Net::SSH::Simple::Error, [e, [host,opts]]
         end
       end
