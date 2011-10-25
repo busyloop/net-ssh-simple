@@ -274,6 +274,85 @@ describe Net::SSH::Simple do
   end
 
   describe "event api" do
+
+    it "works with singleton syntax" do
+      mockie = mock(:callbacks)
+      mockie.should_receive(:start).once.ordered
+      mockie.should_receive(:finish).once.ordered
+      r = Net::SSH::Simple.ssh('localhost', '/bin/sh') do |e,c,d|
+        case e
+          when :start
+            mockie.start()
+            c.send_data("echo 'hello stdout'\n")
+            c.eof!
+          when :finish
+            mockie.finish()
+        end
+      end
+      r.stdout.should == "hello stdout\n"
+      r.stderr.should == ''
+    end
+
+    it "works with instance syntax" do
+      mockie = mock(:callbacks)
+      mockie.should_receive(:start).once.ordered
+      mockie.should_receive(:finish).once.ordered
+      s =  Net::SSH::Simple.new
+      r = s.ssh('localhost', '/bin/sh') do |e,c,d|
+        case e
+          when :start
+            mockie.start()
+            c.send_data("echo 'hello stdout'\n")
+            c.eof!
+          when :finish
+            mockie.finish()
+        end
+      end
+      r.stdout.should == "hello stdout\n"
+      r.stderr.should == ''
+    end
+
+    it "works with synchronous block syntax" do
+      mockie = mock(:callbacks)
+      mockie.should_receive(:start).once.ordered
+      mockie.should_receive(:finish).once.ordered
+      r = Net::SSH::Simple.sync do
+        ssh('localhost', '/bin/sh') do |e,c,d|
+          case e
+            when :start
+              mockie.start()
+              c.send_data("echo 'hello stdout'\n")
+              c.eof!
+            when :finish
+              mockie.finish()
+          end
+        end
+      end
+      r.stdout.should == "hello stdout\n"
+      r.stderr.should == ''
+    end
+
+    it "works with asynchronous block syntax" do
+      t = Net::SSH::Simple.async do
+        mockie = mock(:callbacks)
+        mockie.should_receive(:start).once.ordered
+        mockie.should_receive(:finish).once.ordered
+        ssh('localhost', '/bin/sh') do |e,c,d|
+          case e
+            when :start
+              mockie.start()
+              c.send_data("echo 'hello stdout'\n")
+              c.eof!
+            when :finish
+              mockie.finish()
+          end
+        end
+      end
+      r = t.value
+      r.stdout.should == "hello stdout\n"
+      r.stderr.should == ''
+    end
+
     it "handles long stdin->stdout pipe" do
       mockie = mock(:callbacks)
       mockie.should_receive(:start).once.ordered
