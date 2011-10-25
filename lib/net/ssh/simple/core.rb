@@ -5,7 +5,10 @@ module Net
     # @example
     #   # Block Syntax (synchronous)
     #   Net::SSH::Simple.sync do
-    #     ssh    'example1.com', 'echo "Hello World."'
+    #     r = ssh 'example1.com', 'echo "Hello World."'
+    #     puts r.stdout    #=> "Hello World."
+    #     puts r.exit_code #=> 0
+    #
     #     scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
     #     scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
     #   end
@@ -133,6 +136,72 @@ module Net
     #     end
     #   end
     #
+    # @example
+    #   #
+    #   # Here be dragons: Using the event-API for a stdin->stdout pipeline
+    #   #
+    #   Net::SSH::Simple.sync do
+    #     # open a shell
+    #     r = ssh('localhost', '/bin/sh') do |e,c,d|
+    #       # e = :start, :stdout, :stderr, :exit_code, :exit_signal or :finish
+    #       # c = our Net::SSH::Connection::Channel instance
+    #       # d = data for this event
+    #       case e
+    #         # :start is triggered exactly once per connection
+    #         when :start
+    #           # we can send data using Channel#send_data
+    #           c.send_data("echo 'hello stdout'\n")
+    #           c.send_data("echo 'hello stderr' 1>&2\n")
+    #           # don't forget to eof when done feeding!
+    #           c.eof!
+    #
+    #         # :stdout is triggered when there's stdout data from remote.
+    #         # by default the data is also appended to result[:stdout].
+    #         # you may return :no_append as seen below to avoid that.
+    #         when :stdout
+    #           # read the input line-wise (it *will* arrive fragmented!)
+    #           (@buf ||= '') << d
+    #           while line = @buf.slice!(/(.*)\r?\n/)
+    #             puts line #=> "hello stdout"
+    #           end
+    #           :no_append
+    #
+    #         # :stderr is triggered when there's stderr data from remote.
+    #         # by default the data is also appended to result[:stderr].
+    #         # you may return :no_append as seen below to avoid that.
+    #         when :stderr
+    #           # read the input line-wise (it *will* arrive fragmented!)
+    #           (@buf ||= '') << d
+    #           while line = @buf.slice!(/(.*)\r?\n/)
+    #             puts line #=> "hello stderr"
+    #           end
+    #           :no_append
+    #
+    #         # :exit_code is triggered when the remote process exits normally.
+    #         # it does *not* trigger when the remote process exits by signal!
+    #         when :exit_code
+    #           puts d #=> 0
+    #
+    #         # :exit_signal is triggered when the remote is killed by signal.
+    #         # this would normally raise a Net::SSH::Simple::Error but
+    #         # we suppress that here by returning :no_raise
+    #         when :exit_signal
+    #           puts d  # won't fire in this example, could be "TERM"
+    #           :no_raise
+    #
+    #         # :finish triggers after :exit_code when the command exits normally.
+    #         # it does *not* trigger when the remote process exits by signal!
+    #         when :finish
+    #           puts "we are finished!"
+    #       end
+    #     end
+    #   end
+    #
+    #   # Our Result has been populated normally, except for
+    #   # :stdout and :stdin (because we used :no_append).
+    #   puts r #=> Net::SSH::Simple::Result
+    #
+    #
     # @author moe@busyloop.net
     #
     class Simple
@@ -221,7 +290,7 @@ module Net
       # @param [String] host Destination hostname or ip-address
       # @param [String] cmd  Shell command to execute
       # @param opts (see Net::SSH::Simple#ssh)
-      # @param [Block] block Progress callback (optional)
+      # @param [Block] &block Progress callback (optional)
       # @return [Net::SSH::Simple::Result] Result
       #
       def scp_ul(host, src, dst, opts={}, &block)
@@ -236,7 +305,7 @@ module Net
       # @param [String] host Destination hostname or ip-address
       # @param [String] cmd  Shell command to execute
       # @param [Hash]   opts Parameters for the underlying Net::SSH
-      # @param [Block] block Progress callback (optional)
+      # @param [Block] &block Progress callback (optional)
       # @return [Net::SSH::Simple::Result] Result
       # @see Net::SSH::Simple#scp_ul
       #
@@ -253,6 +322,7 @@ module Net
       # @param [String] host Destination hostname or ip-address
       # @param [String] cmd  Shell command to execute
       # @param [Hash]   opts Parameters for the underlying Net::SSH
+      # @param [Block]  &block Use the event-API (see example above)
       # @option opts [Array] :auth_methods
       #  an array of authentication methods to try
       #
@@ -360,7 +430,7 @@ module Net
       #
       # @see http://net-ssh.github.com/ssh/v2/api/classes/Net/SSH/Config.html
       #      Net::SSH documentation for the 'opts'-hash
-      def ssh(host, cmd, opts={})
+      def ssh(host, cmd, opts={}, &block)
         with_session(host, opts) do |session|
           @result = Result.new(
             { :host   => host, :cmd    => cmd, :start_at => Time.new,
@@ -371,23 +441,33 @@ module Net
             chan.exec cmd do |ch, success|
               @result[:success] = success
               ch.on_data do |c, data|
-                @result[:stdout] += data.to_s
+                r = block.call(:stdout, ch, data) if block
+                @result[:stdout] += data.to_s unless r == :no_append
               end
               ch.on_extended_data do |c, type, data|
-                @result[:stderr] += data.to_s
+                r = block.call(:stderr, ch, data) if block
+                @result[:stderr] += data.to_s unless r == :no_append
               end
               ch.on_request('exit-status') do |c, data|
-                @result[:exit_code] = data.read_long
+                exit_code = data.read_long
+                block.call(:exit_code, ch, exit_code) if block
+                @result[:exit_code] = exit_code
               end
               ch.on_request('exit-signal') do |c, data|
-                @result[:exit_signal] = data.read_string
+                exit_signal = data.read_string
+                r = block.call(:exit_signal, ch, exit_signal) if block
+                @result[:exit_signal] = exit_signal
                 @result[:success] = false
-                raise "Killed by SIG#{@result[:exit_signal]}"
+                unless r == :no_raise
+                  raise "Killed by SIG#{@result[:exit_signal]}"
+                end
               end
+              block.call(:start, ch, nil) if block
             end
           end
           channel.wait
           @result[:finish_at] = Time.new
+          block.call(:finish, channel, nil) if block
           @result
         end
       end

@@ -272,4 +272,215 @@ describe Net::SSH::Simple do
       v.to_s.should == 'Killed by SIGTERM @ ["localhost", {}]'
     end
   end
+
+  describe "event api" do
+    it "handles long stdin->stdout pipe" do
+      mockie = mock(:callbacks)
+      mockie.should_receive(:start).once.ordered
+      mockie.should_receive(:exit_code).once.ordered
+      mockie.should_receive(:finish).once.ordered
+      mockie.should_not_receive(:exit_signal)
+
+      stdout_copy = ''
+      a = Net::SSH::Simple.sync do
+        i = 0
+        r = ssh('localhost', 'sed "s/0/X/g"') do |e,c,d|
+          case e
+            when :start
+              mockie.start()
+              (0..16384).each do |i|
+                c.send_data("foobar #{i}\n")
+              end
+              c.eof!
+            when :stdout
+              stdout_copy << d
+              (@buf ||= '') << d
+              while line = @buf.slice!(/(.*)\r?\n/)
+                line.chop.should == "foobar #{i}".gsub('0','X')
+                i += 1
+              end
+            when :exit_code
+              mockie.exit_code()
+            when :exit_signal
+              mockie.exit_signal()
+            when :finish
+              mockie.finish()
+          end
+        end
+        r.stdout.should == stdout_copy
+        r.stderr.should == ''
+      end
+    end
+
+    it "handles intermingled stdout/stderr" do
+      mockie = mock(:callbacks)
+      mockie.should_receive(:start).once.ordered
+      mockie.should_receive(:exit_code).once.ordered
+      mockie.should_receive(:finish).once.ordered
+      mockie.should_not_receive(:exit_signal)
+      a = Net::SSH::Simple.sync do
+        stdout_c = 0
+        stderr_c = 0
+        stdout_copy = ''
+        stderr_copy = ''
+        r = ssh('localhost', '/bin/sh') do |e,c,d|
+          case e
+            when :start
+              mockie.start()
+              (1..420).each do |i|
+                c.send_data("echo 'hello stderr' 1>&2\n")
+                c.send_data("echo 'hello stdout'\n")
+                c.send_data("echo 'HELLO STDERR' 1>&2\n")
+                c.send_data("echo 'HELLO STDOUT'\n")
+              end
+              c.eof!
+            when :stdout
+              stdout_copy << d
+              (@buf ||= '') << d
+              while line = @buf.slice!(/(.*)\r?\n/)
+                oddeven = stdout_c % 2
+                case oddeven
+                  when 0
+                    line.chop.should == "hello stdout"
+                  else
+                    line.chop.should == "HELLO STDOUT"
+                end
+                stdout_c += 1
+              end
+            when :stderr
+              stderr_copy << d
+              (@buf ||= '') << d
+              while line = @buf.slice!(/(.*)\r?\n/)
+                oddeven = stderr_c % 2
+                case oddeven
+                  when 0
+                    line.chop.should == "hello stderr"
+                  else
+                    line.chop.should == "HELLO STDERR"
+                end
+                stderr_c += 1
+              end
+            when :exit_code
+              mockie.exit_code()
+
+            when :exit_signal
+              mockie.exit_signal()
+
+            when :finish
+              stdout_c.should == 840
+              stderr_c.should == 840
+              mockie.finish()
+          end
+        end
+        # result should be populated
+        r.stdout.should == stdout_copy
+        r.stderr.should == stderr_copy
+        r.exit_code.should == 0
+      end
+    end
+
+    it "handles signals" do
+      mockie = mock(:callbacks)
+      mockie.should_receive(:start).once.ordered
+      mockie.should_not_receive(:exit_code)
+      mockie.should_receive(:exit_signal).once
+      mockie.should_not_receive(:finish)
+
+      victim = Net::SSH::Simple.async do
+        begin
+          ssh('localhost', 'sleep 1020304157') do |e,c,d|
+            case e
+              when :start
+                mockie.start()
+              when :exit_signal
+                d.should == 'TERM'
+                mockie.exit_signal()
+              when :exit_code
+                mockie.exit_code()
+              when :finish
+                mockie.finish()
+            end
+          end
+        rescue => e
+          e
+        end
+      end
+
+      killer = Net::SSH::Simple.async do
+        ssh('localhost', "pkill -f 'sleep 1020304157'")
+      end
+
+      k = killer.value
+      k.success.should == true
+
+      v = victim.value
+      v.to_s.should == 'Killed by SIGTERM @ ["localhost", {}]'
+    end
+
+    it "handles signals (:no_raise)" do
+      mockie = mock(:callbacks)
+      mockie.should_receive(:start).once.ordered
+      mockie.should_not_receive(:exit_code)
+      mockie.should_receive(:exit_signal).once
+      mockie.should_receive(:finish).once.ordered
+
+      victim = Net::SSH::Simple.async do
+        begin
+          ssh('localhost', 'sleep 1020304157') do |e,c,d|
+            case e
+              when :start
+                mockie.start()
+              when :exit_signal
+                d.should == 'TERM'
+                mockie.exit_signal()
+                :no_raise
+              when :exit_code
+                mockie.exit_code()
+              when :finish
+                mockie.finish()
+            end
+          end
+        rescue => e
+          e
+        end
+      end
+
+      killer = Net::SSH::Simple.async do
+        ssh('localhost', "pkill -f 'sleep 1020304157'")
+      end
+
+      k = killer.value
+      k.success.should == true
+
+      v = victim.value
+      v.success.should == false
+      v.exit_signal.should == 'TERM'
+    end
+
+    it "respects :no_append" do
+      r = Net::SSH::Simple.sync do
+        stdout_c = 0
+        stderr_c = 0
+        stdout_copy = ''
+        stderr_copy = ''
+        ssh('localhost', '/bin/sh') do |e,c,d|
+          case e
+            when :start
+              c.send_data("echo 'hello stderr' 1>&2\n")
+              c.send_data("echo 'hello stdout'\n")
+              c.send_data("echo 'HELLO STDERR' 1>&2\n")
+              c.send_data("echo 'HELLO STDOUT'\n")
+              c.eof!
+            when :stdout
+              :no_append
+            when :stderr
+              :no_append
+          end
+        end
+      end
+      r.stdout.should == ''
+      r.stderr.should == ''
+    end
+
+  end
 end
