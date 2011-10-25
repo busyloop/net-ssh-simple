@@ -15,18 +15,19 @@ module Net
     #
     # @example
     #   # Block Syntax (asynchronous)
-    #   a = Net::SSH::Simple.async do
-    #     ssh    'example1.com', 'echo "Hello World."'
-    #     scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
-    #     scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
+    #   t1 = Net::SSH::Simple.async do
+    #     scp_ul 'example1.com', '/tmp/local_foo', '/tmp/remote_bar'
+    #     ssh    'example3.com', 'echo "Hello World A."'
     #   end
-    #   b = Net::SSH::Simple.async do
-    #     ssh    'example4.com', 'echo "Hello World."'
-    #     scp_ul 'example5.com', '/tmp/local_foo', '/tmp/remote_bar'
+    #   t2 = Net::SSH::Simple.async do
     #     scp_dl 'example6.com', '/tmp/remote_foo', '/tmp/local_bar'
+    #     ssh    'example7.com', 'echo "Hello World B."'
     #   end
-    #   a.value # Wait for thread A to finish and capture result
-    #   b.value # Wait for thread B to finish and capture result
+    #   r1 = t1.value # wait for t1 to finish and grab return value
+    #   r2 = t2.value # wait for t1 to finish and grab return value
+    #
+    #   puts r1.stdout #=> "Hello World A."
+    #   puts r2.stdout #=> "Hello World B."
     #
     # @example
     #   # Using an instance
@@ -53,12 +54,12 @@ module Net
     #         puts "Success! I Helloed World."
     #       end
     #
-    #       scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
+    #       r = scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
     #       if r.success and r.sent == r.total
     #         puts "Success! Uploaded #{r.sent} of #{r.total} bytes."
     #       end
     #
-    #       scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
+    #       r = scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
     #       if r.success and r.sent == r.total
     #         puts "Success! Downloaded #{r.sent} of #{r.total} bytes."
     #       end
@@ -67,29 +68,28 @@ module Net
     #     puts "Something bad happened!"
     #     puts e          # Human readable error
     #     puts e.wrapped  # Original Exception
-    #     puts e.result   # Net::SSH::Simple::Result (partial result)
+    #     puts e.result   # Net::SSH::Simple::Result
     #   end
     #
     # @example
     #   # Error Handling with Block Syntax (asynchronous)
     #   #
-    #   # Exceptions are thrown inside your thread.
+    #   # Exceptions are raised inside your thread.
     #   # You are free to handle them or pass them outwards.
-    #   #
     #
     #   a = Net::SSH::Simple.async do
     #     begin
     #       ssh    'example1.com', 'echo "Hello World."'
     #       scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
     #       scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
-    #     rescue Net::SSH::Result => e
+    #     rescue Net::SSH::Simple::Error => e
     #       # return our exception to the parent thread
     #       e
     #     end
     #   end
     #   r = a.value # Wait for thread to finish and capture result
     #
-    #   unless r.is_a? Net::SSH::Result
+    #   unless r.is_a? Net::SSH::Simple::Result
     #     puts "Something bad happened!"
     #     puts r
     #   end
@@ -122,7 +122,7 @@ module Net
     #   end
     #
     # @example
-    #   # Parametrizing Net::SSH
+    #   # Parameters
     #   Net::SSH::Simple.sync do
     #     ssh('example1.com', 'echo "Hello World."',
     #         {:user => 'tom', :password => 'jerry', :port => 1234})
@@ -590,13 +590,13 @@ module Net
         # Reference to the underlying Exception
         attr_reader :wrapped
 
-        # Context for the operation that failed, as an Array: [host, opts, result].
+        # Context of the operation that failed, as an Array: [host, opts, result].
         #
         # @deprecated
         #   This will be removed soon, use {#result} instead!
         attr_reader :context
 
-        # {Net::SSH::Simple::Result} for the interrupted operation.
+        # {Net::SSH::Simple::Result} of the interrupted operation.
         attr_reader :result
 
         def initialize(msg, e=$!)

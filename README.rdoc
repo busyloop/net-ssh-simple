@@ -33,18 +33,19 @@ Net::SSH::Simple is a simple wrapper around Net::SSH and Net::SCP.
 
  require 'net/ssh/simple'
 
- a = Net::SSH::Simple.async do
-   ssh    'example1.com', 'echo "Hello World."'
-   scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
-   scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
+ t1 = Net::SSH::Simple.async do
+   scp_ul 'example1.com', '/tmp/local_foo', '/tmp/remote_bar'
+   ssh    'example3.com', 'echo "Hello World A."'
  end
- b = Net::SSH::Simple.async do
-   ssh    'example4.com', 'echo "Hello World."'
-   scp_ul 'example5.com', '/tmp/local_foo', '/tmp/remote_bar'
+ t2 = Net::SSH::Simple.async do
    scp_dl 'example6.com', '/tmp/remote_foo', '/tmp/local_bar'
+   ssh    'example7.com', 'echo "Hello World B."'
  end
- a.value # Wait for thread A to finish and capture result
- b.value # Wait for thread B to finish and capture result
+ r1 = t1.value # wait for t1 to finish and grab return value
+ r2 = t2.value # wait for t1 to finish and grab return value
+
+ puts r1.stdout #=> "Hello World A."
+ puts r2.stdout #=> "Hello World B."
 
 === Using an instance
 
