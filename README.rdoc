@@ -55,7 +55,22 @@ Net::SSH::Simple is a simple wrapper around Net::SSH and Net::SCP.
  s.scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
  s.scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
  s.close
- 
+
+=== Handling a Timeout
+
+ require 'net/ssh/simple'
+
+ # Hint: Set timeout=0 to disable, default is 60
+ begin
+   Net::SSH::Simple.sync({:timeout => 5}) do
+     ssh('example1.com', 'sleep 1')  # I will (probably) succeed!
+     ssh('example2.com', 'sleep 60') # I will fail :(
+   end
+ rescue Net::SSH::Simple::Error => e
+   puts e.result.timed_out #=> true
+ end
+
+  
 == Documentation
 
 See {Net::SSH::Simple}[http://rubydoc.info/gems/net-ssh-simple/Net/SSH/Simple] for more examples and full API.

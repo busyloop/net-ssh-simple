@@ -1,4 +1,3 @@
-require 'timeout'
 module Net
   module SSH
     # Net::SSH::Simple is a simple wrapper around Net::SSH and Net::SCP.
@@ -67,8 +66,8 @@ module Net
     #   rescue Net::SSH::Simple::Error => e
     #     puts "Something bad happened!"
     #     puts e          # Human readable error
-    #     puts e.wrapped  # Original Exception from Net::SSH
-    #     puts e.context  # Config that triggered the error
+    #     puts e.wrapped  # Original Exception
+    #     puts e.result   # Net::SSH::Simple::Result (partial result)
     #   end
     #
     # @example
@@ -116,8 +115,8 @@ module Net
     #   rescue Net::SSH::Simple::Error => e
     #     puts "Something bad happened!"
     #     puts e          # Human readable error
-    #     puts e.wrapped  # Original Exception from Net::SSH
-    #     puts e.context  # Config that triggered the error
+    #     puts e.wrapped  # Original Exception
+    #     puts e.result   # Net::SSH::Simple::Result (partial result)
     #   ensure
     #     s.close # don't forget the clean up!
     #   end
@@ -127,6 +126,27 @@ module Net
     #   Net::SSH::Simple.sync do
     #     ssh('example1.com', 'echo "Hello World."',
     #         {:user => 'tom', :password => 'jerry', :port => 1234})
+    #   end
+    #
+    #   # Parameter inheritance
+    #   Net::SSH::Simple.sync({:user => 'tom', :port => 1234}) do
+    #     # Both commands will inherit :user and :port
+    #     ssh('example1.com', 'echo "Hello World."', {:password => 'jerry'})
+    #     scp_ul('example2.com', '/tmp/a', '/tmp/a', {:password => 's3cr3t'})
+    #   end
+    #
+    # @example
+    #   # Timeout handling
+    #   #
+    #   # Note: The timeout applies to each command independently.
+    #   # Hint: Set timeout=0 to disable, default is 60
+    #   begin
+    #     Net::SSH::Simple.sync({:timeout => 5}) do
+    #       ssh('example1.com', 'sleep 1')  # I will (probably) succeed!
+    #       ssh('example2.com', 'sleep 60') # I will fail :(
+    #     end
+    #   rescue Net::SSH::Simple::Error => e
+    #     puts e.result.timed_out #=> true
     #   end
     #
     # @example
@@ -298,6 +318,7 @@ module Net
       # @return [Net::SSH::Simple::Result] Result
       #
       def scp_ul(host, src, dst, opts={}, &block)
+        opts = @opts.merge(opts)
         scp(:upload, host, src, dst, opts, &block)
       end
 
@@ -308,12 +329,13 @@ module Net
       # 
       # @param [String] host Destination hostname or ip-address
       # @param [String] cmd  Shell command to execute
-      # @param [Hash]   opts Parameters for the underlying Net::SSH
+      # @param opts (see Net::SSH::Simple#ssh)
       # @param [Block] &block Progress callback (optional)
       # @return [Net::SSH::Simple::Result] Result
       # @see Net::SSH::Simple#scp_ul
       #
       def scp_dl(host, src, dst, opts={}, &block)
+        opts = @opts.merge(opts)
         scp(:download, host, src, dst, opts, &block)
       end
 
@@ -325,8 +347,8 @@ module Net
       # @return [Net::SSH::Simple::Result] Result
       # @param [String] host Destination hostname or ip-address
       # @param [String] cmd  Shell command to execute
-      # @param [Hash]   opts Parameters for the underlying Net::SSH
       # @param [Block]  &block Use the event-API (see example above)
+      # @param [Hash]   opts SSH options
       # @option opts [Array] :auth_methods
       #  an array of authentication methods to try
       #
@@ -400,7 +422,7 @@ module Net
       #  the port to use when connecting to the remote host
       #
       # @option opts [Hash] :properties
-      #  a hash of key/value pairs to add to the new connection’s properties
+      #  a hash of key/value pairs to add to the new connection's properties
       #  (see Net::SSH::Connection::Session#properties)
       #
       # @option opts [String] :proxy
@@ -415,8 +437,8 @@ module Net
       # @option opts [Integer] :rekey_packet_limit
       #  the max number of packets to process before rekeying
       #
-      # @option opts [Integer] :timeout
-      #  how long to wait for the initial connection to be made
+      # @option opts [Integer] :timeout (60)
+      #  connection timeout. this is enforced by Net::SSH::Simple.
       #
       # @option opts [String] :user
       #  the username to log in as
@@ -435,10 +457,11 @@ module Net
       # @see http://net-ssh.github.com/ssh/v2/api/classes/Net/SSH/Config.html
       #      Net::SSH documentation for the 'opts'-hash
       def ssh(host, cmd, opts={}, &block)
+        opts = @opts.merge(opts)
         with_session(host, opts) do |session|
           @result = Result.new(
-            { :host   => host, :cmd    => cmd, :start_at => Time.new,
-              :stdout => ''  , :stderr => '' , :success  => nil 
+            { :op => :ssh, :host => host, :cmd => cmd, :start_at => Time.new,
+              :opts => opts, :stdout => '', :stderr => '', :success => nil 
             } )
 
           channel = session.open_channel do |chan|
@@ -478,7 +501,8 @@ module Net
 
       dsl_methods false
 
-      def initialize()
+      def initialize(opts={})
+        @opts     = opts
         @sessions = {}
         @result   = Result.new
       end
@@ -487,21 +511,23 @@ module Net
       # Spawn a Thread to perform a sequence of ssh/scp operations.
       # 
       # @param [Block] block 
+      # @param opts (see Net::SSH::Simple#ssh)
       # @return [Thread] Thread executing the SSH-Block.
       #
-      def self.async(&block)
+      def self.async(opts={}, &block)
         Thread.new do
-          self.sync(&block)
+          self.sync(opts, &block)
         end
       end
 
       #
       # Perform a sequence of ssh/scp operations.
       #
+      # @param opts (see Net::SSH::Simple#ssh)
       # @return [Net::SSH::Simple::Result] Result
       #
-      def self.sync(&block)
-        s = self.new
+      def self.sync(opts={}, &block)
+        s = self.new(opts)
         r = Blockenspiel.invoke(block, s)
         s.close
         r
@@ -530,18 +556,17 @@ module Net
         rescue => e
           opts[:password].gsub!(/./,'*') if opts.include? :password
           @result[:exception] = e
-          @result[:context] = [host,opts]
           @result[:success] = false
           @result[:timed_out] = true
           @result[:finish_at] = Time.new
-          raise Net::SSH::Simple::Error, [e, [host,opts]]
+          raise Net::SSH::Simple::Error, [e, [host,opts,@result]]
         end
       end
 
       def scp(mode, host, src, dst, opts={}, &block)
         @result = Result.new(
-          { :host   => host, :cmd  => :scp_dl, :start_at => Time.new,
-            :src => src    , :dst  => dst    , :success  => false
+          { :op => :scp, :host => host, :opts => opts, :cmd => :scp_dl,
+            :start_at => Time.new, :src => src, :dst  => dst, :success => false
           } )
         with_session(host, opts) do |session|
           lt = 0
@@ -562,15 +587,23 @@ module Net
       # Error that occured during a Net::SSH::Simple operation.
       #
       class Error < RuntimeError
-        # Reference to the underlying Net::SSH Exception
+        # Reference to the underlying Exception
         attr_reader :wrapped
-        # The opts-hash of the operation that triggered the Error
+
+        # Context for the operation that failed, as an Array: [host, opts, result].
+        #
+        # @deprecated
+        #   This will be removed soon, use {#result} instead!
         attr_reader :context
+
+        # {Net::SSH::Simple::Result} for the interrupted operation.
+        attr_reader :result
 
         def initialize(msg, e=$!)
           super(msg)
           @wrapped = e
           @context = msg[1]
+          @result  = msg[1][2]
         end
 
         def to_s
@@ -582,9 +615,11 @@ module Net
       # Result of a Net::SSH::Simple operation.
       #
       # @attr [String] host Hostname/IP address
+      # @attr [Symbol] op :ssh or :scp
       # @attr [String] cmd Shell command (SSH only)
       # @attr [Time] start_at Operation start timestamp
       # @attr [Time] finish_at Operation finish timestamp
+      # @attr [Boolean] timed_out Set to true if the operation timed out
       # @attr [String] stdout Output to stdout (SSH only)
       # @attr [String] stderr Output to stderr (SSH only)
       # @attr [boolean] success
@@ -592,7 +627,7 @@ module Net
       # @attr [Integer] total Size of requested file (in bytes, SCP only)
       # @attr [Integer] sent Number of bytes transferred (SCP only)
       # @attr [String] exit_signal
-      #   Only present if the remote command terminates due to a signal (SSH only)
+      #   Only present if the remote command terminated due to a signal (SSH only)
       #
       class Result < Hashie::Mash; end
     end

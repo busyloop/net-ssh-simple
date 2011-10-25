@@ -17,14 +17,19 @@ require 'securerandom'
 #    Port 22
 #
 # The test-suite will (over)write the following files on localhost:
-#   /tmp/ssh_test_in{0,1,2,3,4}
-#   /tmp/ssh_test_out{0,1,2,3,4}
+#   /tmp/ssh_test_in*
+#   /tmp/ssh_test_out*
 #
+
+CONCURRENCY = 16
+
+BENCHMARK_ITER = 10
+BENCHMARK_CONCURRENCY = 128
 
 describe Net::SSH::Simple do
   describe "singleton" do
     before :each do
-      (0..4).each do |i|
+      (0..CONCURRENCY).each do |i|
         begin
           File.unlink(File.join('/tmp', "ssh_test_in#{i}"))
         rescue; end
@@ -37,16 +42,32 @@ describe Net::SSH::Simple do
       end
     end
 
-    it "fails gently" do
-      lambda {
-        Net::SSH::Simple.ssh('localhost', 'true', {:port => 0})
-      }.should raise_error(Net::SSH::Simple::Error)
+    it "enforces timeout" do
+      raised = false
+      begin
+        r = Net::SSH::Simple.ssh('localhost', 'sleep 60', {:timeout => 1})
+      rescue => e
+        raised = true
+        e.to_s.should match /^execution expired @ .*/
+        e.result.op == :ssh
+        e.result.timed_out.should == true
+      end
+      raised.should == true
+    end
 
+    it "interprets timeout=0 as no timeout" do
+      Net::SSH::Simple.ssh('localhost', 'sleep 2', {:timeout => 0})
+    end
+
+    it "fails gently" do
+      raised = false
       begin
         Net::SSH::Simple.ssh('localhost', 'true', {:port => 0})
       rescue => e
-        e.to_s.should == 'Connection refused - connect(2) @ ["localhost", {:port=>0}]'
+        raised = true
+        e.to_s.should match /^Connection refused - connect\(2\).*/
       end
+      raised.should == true
     end
 
     it "returns a result" do
@@ -95,7 +116,7 @@ describe Net::SSH::Simple do
     before :each do
       @s = Net::SSH::Simple.new
 
-      (0..4).each do |i|
+      (0..CONCURRENCY).each do |i|
         begin
           File.unlink(File.join('/tmp', "ssh_test_in#{i}"))
         rescue; end
@@ -140,6 +161,7 @@ describe Net::SSH::Simple do
         mockback.ping
       end
       r.success.should == true
+      r.op.should == :scp
       Digest::MD5.file('/tmp/ssh_test_in0').should == Digest::MD5.file('/tmp/ssh_test_out0')
     end
 
@@ -150,6 +172,7 @@ describe Net::SSH::Simple do
         mockback.ping
       end
       r.success.should == true
+      r.op.should == :scp
       Digest::MD5.file('/tmp/ssh_test_in0').should == Digest::MD5.file('/tmp/ssh_test_out0')
     end
   end
@@ -211,7 +234,7 @@ describe Net::SSH::Simple do
 
   describe "asynchronous block syntax" do
     before :each do
-      (0..4).each do |i|
+      (0..CONCURRENCY).each do |i|
         begin
           File.unlink(File.join('/tmp', "ssh_test_in#{i}"))
         rescue; end
@@ -226,7 +249,7 @@ describe Net::SSH::Simple do
 
     it "copes with a little concurrency" do
       t = []
-      (0..4).each do |i|
+      (0..CONCURRENCY).each do |i|
         t[i] = Net::SSH::Simple.async do
           mockback = mock(:progress_callback)
           mockback.should_receive(:ping).at_least(:once)
@@ -245,10 +268,44 @@ describe Net::SSH::Simple do
         end
       end
 
-      (0..4).each do |i|
+      (0..CONCURRENCY).each do |i|
         r = t[i].value
         r.stdout.should == "hello #{i}\n"
         Digest::MD5.file("/tmp/ssh_test_in#{i}").should == Digest::MD5.file("/tmp/ssh_test_out#{i}")
+      end
+    end
+
+    it "doesn't break under high concurrency", :benchmark => true do
+      iter = 0
+      (0..BENCHMARK_ITER).each do
+        iter += 1
+        t = []
+        (0..BENCHMARK_CONCURRENCY).each do |i|
+          #t[i] = Net::SSH::Simple.async(:verbose=>Logger::DEBUG) do
+          t[i] = Net::SSH::Simple.async do
+            mockback = mock(:progress_callback)
+            mockback.should_receive(:ping).at_least(:once)
+            r = nil
+            if 0 == i % 2 
+              r = scp_dl('localhost', "/tmp/ssh_test_in#{i}", "/tmp/ssh_test_out#{i}") do |sent,total|
+                mockback.ping
+              end
+            else
+              r = scp_ul('localhost', "/tmp/ssh_test_in#{i}", "/tmp/ssh_test_out#{i}") do |sent,total|
+                mockback.ping
+              end
+            end
+            r.success.should == true
+            ssh('localhost', "echo hello #{i}")
+          end
+        end
+
+        (0..BENCHMARK_CONCURRENCY).each do |i|
+          r = t[i].value
+          r.stdout.should == "hello #{i}\n"
+          Digest::MD5.file("/tmp/ssh_test_in#{i}").should == Digest::MD5.file("/tmp/ssh_test_out#{i}")
+        end
+        puts "#{iter}/#{BENCHMARK_ITER}"
       end
     end
 
@@ -269,12 +326,73 @@ describe Net::SSH::Simple do
       k.success.should == true
 
       v = victim.value
-      v.to_s.should == 'Killed by SIGTERM @ ["localhost", {}]'
+      v.to_s.should match /Killed by SIGTERM @ .*/
+    end
+  end
+
+  describe "parameter inheritance" do
+    it "works with instance syntax" do
+      s = Net::SSH::Simple.new({:timeout => 7})
+      r = s.ssh('localhost', 'date', {:rekey_packet_limit => 42})
+      r.op.should == :ssh
+      r.opts[:timeout].should == 7
+      r.opts[:rekey_packet_limit].should == 42
+
+      r = s.scp_dl('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0',
+                     {:rekey_packet_limit => 42})
+      r.op.should == :scp
+      r.opts[:timeout].should == 7
+      r.opts[:rekey_packet_limit].should == 42
+
+      r = s.scp_ul('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0',
+                     {:rekey_packet_limit => 42})
+      r.op.should == :scp
+      r.opts[:timeout].should == 7
+      r.opts[:rekey_packet_limit].should == 42
+
+      s.close
+    end
+
+    it "works with synchronous block syntax" do
+      r = Net::SSH::Simple.sync({:timeout => 7}) do
+        r = ssh('localhost', 'date', {:rekey_packet_limit => 42})
+        r.opts[:timeout].should == 7
+        r.opts[:rekey_packet_limit].should == 42
+
+        r = scp_ul('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0',
+                   {:rekey_packet_limit => 42})
+        r.opts[:timeout].should == 7
+        r.opts[:rekey_packet_limit].should == 42
+
+        r = scp_dl('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0',
+                   {:rekey_packet_limit => 42})
+        r.opts[:timeout].should == 7
+        r.opts[:rekey_packet_limit].should == 42
+      end
+    end
+
+    it "works with asynchronous block syntax" do
+      t = Net::SSH::Simple.async({:timeout => 7}) do
+        r = ssh('localhost', 'date', {:rekey_packet_limit => 42})
+        r.opts[:timeout].should == 7
+        r.opts[:rekey_packet_limit].should == 42
+
+        r = scp_ul('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0',
+                   {:rekey_packet_limit => 42})
+        r.opts[:timeout].should == 7
+        r.opts[:rekey_packet_limit].should == 42
+
+        r = scp_dl('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0',
+                   {:rekey_packet_limit => 42})
+        r.opts[:timeout].should == 7
+        r.opts[:rekey_packet_limit].should == 42
+        :happy
+      end
+      t.value.should == :happy
     end
   end
 
   describe "event api" do
-
     it "works with singleton syntax" do
       mockie = mock(:callbacks)
       mockie.should_receive(:start).once.ordered
@@ -493,7 +611,7 @@ describe Net::SSH::Simple do
       k.success.should == true
 
       v = victim.value
-      v.to_s.should == 'Killed by SIGTERM @ ["localhost", {}]'
+      v.to_s.should match /Killed by SIGTERM @ .*/
     end
 
     it "handles signals (:no_raise)" do
