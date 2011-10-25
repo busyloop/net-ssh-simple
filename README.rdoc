@@ -9,7 +9,7 @@ Net::SSH::Simple is a simple wrapper around Net::SSH and Net::SCP.
 * All errors are raised as {Net::SSH::Simple::Error}[http://rubydoc.info/gems/net-ssh-simple/Net/SSH/Simple/Error]
 * Efficient by default; re-uses transport connections where possible
 * Lots of documentation
-* 100% test coverage
+* {100%}[https://busyloop.net/oss/net-ssh-simple/coverage/] test coverage
 
 == Installation
 

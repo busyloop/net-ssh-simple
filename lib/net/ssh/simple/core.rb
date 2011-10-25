@@ -140,9 +140,9 @@ module Net
     #   #
     #   # Here be dragons: Using the event-API for a stdin->stdout pipeline
     #   #
-    #   Net::SSH::Simple.sync do
+    #   r = Net::SSH::Simple.sync do
     #     # open a shell
-    #     r = ssh('localhost', '/bin/sh') do |e,c,d|
+    #     ssh('localhost', '/bin/sh') do |e,c,d|
     #       # e = :start, :stdout, :stderr, :exit_code, :exit_signal or :finish
     #       # c = our Net::SSH::Connection::Channel instance
     #       # d = data for this event
@@ -199,7 +199,10 @@ module Net
     #
     #   # Our Result has been populated normally, except for
     #   # :stdout and :stdin (because we used :no_append).
-    #   puts r #=> Net::SSH::Simple::Result
+    #   puts r           #=> Net::SSH::Simple::Result
+    #   puts r.exit_code #=> 0
+    #   puts r.stdout    #=> ''
+    #   puts r.stderr    #=> ''
     #
     #
     # @author moe@busyloop.net
