@@ -1,3 +1,24 @@
+#
+# Copyright (C) 2011 by moe@busyloop.net
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
 module Net
   module SSH
     # Net::SSH::Simple is a simple wrapper around Net::SSH and Net::SCP.
@@ -559,7 +580,7 @@ module Net
           @result[:success] = false
           @result[:timed_out] = true
           @result[:finish_at] = Time.new
-          raise Net::SSH::Simple::Error, [e, [host,opts,@result]]
+          raise Net::SSH::Simple::Error, [e, @result]
         end
       end
 
@@ -590,20 +611,13 @@ module Net
         # Reference to the underlying Exception
         attr_reader :wrapped
 
-        # Context of the operation that failed, as an Array: [host, opts, result].
-        #
-        # @deprecated
-        #   This will be removed soon, use {#result} instead!
-        attr_reader :context
-
         # {Net::SSH::Simple::Result} of the interrupted operation.
         attr_reader :result
 
         def initialize(msg, e=$!)
           super(msg)
           @wrapped = e
-          @context = msg[1]
-          @result  = msg[1][2]
+          @result  = msg[1]
         end
 
         def to_s
