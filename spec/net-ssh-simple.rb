@@ -253,18 +253,24 @@ describe Net::SSH::Simple do
         t[i] = Net::SSH::Simple.async do
           mockback = mock(:progress_callback)
           mockback.should_receive(:ping).at_least(:once)
-          r = nil
-          if 0 == i % 2 
-            r = scp_dl('localhost', "/tmp/ssh_test_in#{i}", "/tmp/ssh_test_out#{i}") do |sent,total|
-              mockback.ping
+          mockback.should_not_receive(:exception)
+          begin
+            r = nil
+            if 0 == i % 2 
+              r = scp_dl('localhost', "/tmp/ssh_test_in#{i}", "/tmp/ssh_test_out#{i}") do |sent,total|
+                mockback.ping
+              end
+            else
+              r = scp_ul('localhost', "/tmp/ssh_test_in#{i}", "/tmp/ssh_test_out#{i}") do |sent,total|
+                mockback.ping
+              end
             end
-          else
-            r = scp_ul('localhost', "/tmp/ssh_test_in#{i}", "/tmp/ssh_test_out#{i}") do |sent,total|
-              mockback.ping
-            end
+            r.success.should == true
+            ssh('localhost', "echo hello #{i}")
+          rescue => e
+            p e
+            mockback.exception()
           end
-          r.success.should == true
-          ssh('localhost', "echo hello #{i}")
         end
       end
 
