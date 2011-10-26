@@ -579,7 +579,7 @@ module Net
           opts[:password].gsub!(/./,'*') if opts.include? :password
           @result[:exception] = e
           @result[:success] = false
-          @result[:timed_out] = true
+          @result[:timed_out] = true if e.is_a? Timeout::Error
           @result[:finish_at] = Time.new
           raise Net::SSH::Simple::Error, [e, @result]
         end

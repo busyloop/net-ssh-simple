@@ -66,6 +66,7 @@ describe Net::SSH::Simple do
       rescue => e
         raised = true
         e.to_s.should match /^Connection refused - connect\(2\).*/
+        e.result.timed_out.should == nil
       end
       raised.should == true
     end
