@@ -524,7 +524,7 @@ module Net
 
       def initialize(opts={})
         @opts     = opts
-        @sessions = {}
+        Thread.current[:ssh_simple_sessions] = {}
         @result   = Result.new
       end
 
@@ -560,7 +560,7 @@ module Net
       # @return [Net::SSH::Simple::Result] Result
       # 
       def close
-        @sessions.values.each do |session|
+        Thread.current[:ssh_simple_sessions].values.each do |session|
           session.close
         end
         @result
@@ -570,8 +570,9 @@ module Net
       def with_session(host, opts={:timeout => 60}, &block)
         begin
           Timeout.timeout(opts[:timeout]) do
-            session = @sessions[host.hash] = @sessions[host.hash] ||\
-              Net::SSH.start(*[host, opts[:user], opts])
+            session = Thread.current[:ssh_simple_sessions][host.hash] \
+                    = Thread.current[:ssh_simple_sessions][host.hash] \
+                   || Net::SSH.start(*[host, opts[:user], opts])
             block.call(session)
           end
         rescue => e
