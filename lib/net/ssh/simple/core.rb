@@ -157,20 +157,6 @@ module Net
     #   end
     #
     # @example
-    #   # Timeout handling
-    #   #
-    #   # Note: The timeout applies to each command independently.
-    #   # Hint: Set timeout=0 to disable, default is 60
-    #   begin
-    #     Net::SSH::Simple.sync({:timeout => 5}) do
-    #       ssh('example1.com', 'sleep 1')  # I will (probably) succeed!
-    #       ssh('example2.com', 'sleep 60') # I will fail :(
-    #     end
-    #   rescue Net::SSH::Simple::Error => e
-    #     puts e.result.timed_out #=> true
-    #   end
-    #
-    # @example
     #   # Using the SCP progress callback
     #   Net::SSH::Simple.sync do
     #     scp_ul 'example1.com', '/tmp/local_foo', '/tmp/remote_bar' do |sent, total|
@@ -459,7 +445,17 @@ module Net
       #  the max number of packets to process before rekeying
       #
       # @option opts [Integer] :timeout (60)
-      #  connection timeout. this is enforced by Net::SSH::Simple.
+      #   maximum idle time before a connection will time out (0 = disable).
+      #
+      # @option opts [Integer] :operation_timeout (3600)
+      #   maximum time before aborting an operation (0 = disable).
+      #   you may use this to guard against run-away processes.
+      #
+      # @option opts [Integer] :close_timeout (5)
+      #  grace-period on close before the connection will be terminated forcefully
+      #  (0 = terminate immediately).
+      #
+      # @option opts [String] :user
       #
       # @option opts [String] :user
       #  the username to log in as
@@ -482,26 +478,31 @@ module Net
         with_session(host, opts) do |session|
           @result = Result.new(
             { :op => :ssh, :host => host, :cmd => cmd, :start_at => Time.new,
-              :opts => opts, :stdout => '', :stderr => '', :success => nil 
+              :last_event_at => Time.new, :opts => opts, :stdout => '', :stderr => '',
+              :success => nil 
             } )
 
           channel = session.open_channel do |chan|
             chan.exec cmd do |ch, success|
               @result[:success] = success
               ch.on_data do |c, data|
+                @result[:last_event_at] = Time.new
                 r = block.call(:stdout, ch, data) if block
                 @result[:stdout] += data.to_s unless r == :no_append
               end
               ch.on_extended_data do |c, type, data|
+                @result[:last_event_at] = Time.new
                 r = block.call(:stderr, ch, data) if block
                 @result[:stderr] += data.to_s unless r == :no_append
               end
               ch.on_request('exit-status') do |c, data|
+                @result[:last_event_at] = Time.new
                 exit_code = data.read_long
                 block.call(:exit_code, ch, exit_code) if block
                 @result[:exit_code] = exit_code
               end
               ch.on_request('exit-signal') do |c, data|
+                @result[:last_event_at] = Time.new
                 exit_signal = data.read_string
                 r = block.call(:exit_signal, ch, exit_signal) if block
                 @result[:exit_signal] = exit_signal
@@ -513,7 +514,7 @@ module Net
               block.call(:start, ch, nil) if block
             end
           end
-          channel.wait
+          wait_for_channel session, channel, @result, opts[:timeout]
           @result[:finish_at] = Time.new
           block.call(:finish, channel, nil) if block
           @result
@@ -561,18 +562,34 @@ module Net
       # 
       def close
         Thread.current[:ssh_simple_sessions].values.each do |session|
-          session.close
+          begin
+            Timeout.timeout(@opts[:close_timeout] || 5) { session.close }
+          rescue => e
+            begin
+              session.shutdown!
+            rescue
+            end
+          end
         end
         @result
       end
 
+
       private
-      def with_session(host, opts={:timeout => 60}, &block)
+      EXTRA_OPTS = [:operation_timeout, :close_timeout]
+
+      def with_session(host, opts={}, &block)
+        opts[:timeout] ||= 60
+        opts[:timeout] = 2**32 if opts[:timeout] == 0
+        opts[:operation_timeout] ||= 3600
+        opts[:operation_timeout] = 2**32 if opts[:operation_timeout] == 0
+        opts[:close_timeout] ||= 5
         begin
-          Timeout.timeout(opts[:timeout]) do
+          net_ssh_opts = opts.reject{|k,v| EXTRA_OPTS.include? k }
+          Timeout.timeout(opts[:operation_timeout]) do
             session = Thread.current[:ssh_simple_sessions][host.hash] \
                     = Thread.current[:ssh_simple_sessions][host.hash] \
-                   || Net::SSH.start(*[host, opts[:user], opts])
+                   || Net::SSH.start(*[host, opts[:user], net_ssh_opts])
             block.call(session)
           end
         rescue => e
@@ -585,10 +602,20 @@ module Net
         end
       end
 
+      def wait_for_channel(session, channel, result, timeout)
+        session.loop(1) do
+          if timeout < Time.now - result[:last_event_at]
+            raise Timeout::Error, 'idle timeout'
+          end
+          channel.active?
+        end
+      end
+
       def scp(mode, host, src, dst, opts={}, &block)
         @result = Result.new(
           { :op => :scp, :host => host, :opts => opts, :cmd => :scp_dl,
-            :start_at => Time.new, :src => src, :dst  => dst, :success => false
+            :last_event_at => Time.new, :start_at => Time.new, 
+            :src => src, :dst  => dst, :success => false
           } )
         with_session(host, opts) do |session|
           lt = 0
@@ -596,9 +623,10 @@ module Net
             @result[:name] ||= name
             @result[:total] ||= total
             @result[:sent] = sent
+            @result[:last_event_at] = Time.new
             block.call(sent, total) unless block.nil?
           end
-          channel.wait
+          wait_for_channel session, channel, @result, opts[:timeout]
           @result[:finish_at] = Time.new
           @result[:success] = @result[:sent] == @result[:total]
           @result
@@ -634,6 +662,7 @@ module Net
       # @attr [String] cmd Shell command (SSH only)
       # @attr [Time] start_at Operation start timestamp
       # @attr [Time] finish_at Operation finish timestamp
+      # @attr [Time] last_event_at Timestamp of last activity
       # @attr [Boolean] timed_out Set to true if the operation timed out
       # @attr [String] stdout Output to stdout (SSH only)
       # @attr [String] stderr Output to stderr (SSH only)

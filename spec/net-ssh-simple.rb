@@ -42,10 +42,57 @@ describe Net::SSH::Simple do
       end
     end
 
-    it "enforces timeout" do
+    it "enforces idle timeout" do
       raised = false
       begin
         r = Net::SSH::Simple.ssh('localhost', 'sleep 60', {:timeout => 1})
+      rescue => e
+        raised = true
+        e.to_s.should match /^idle timeout @ .*/
+        e.result.op == :ssh
+        e.result.timed_out.should == true
+      end
+      raised.should == true
+    end
+
+    it "enforces operation timeout on ssh" do
+      raised = false
+      begin
+        r = Net::SSH::Simple.ssh('localhost', 'while true; do echo "buh"; sleep 1; done', {:operation_timeout => 2})
+      rescue => e
+        raised = true
+        e.to_s.should match /^execution expired @ .*/
+        e.result.op == :ssh
+        e.result.timed_out.should == true
+      end
+      raised.should == true
+    end
+
+    it "enforces operation timeout on scp_ul" do
+      raised = false
+      begin
+        r = Net::SSH::Simple.scp_ul('localhost', '/tmp/ssh_test_in0',
+                                    '/tmp/ssh_test_out0', {:operation_timeout=>1}) \
+        do |sent,total|
+          sleep 5
+        end
+      rescue => e
+        raised = true
+        e.to_s.should match /^execution expired @ .*/
+        e.result.op == :ssh
+        e.result.timed_out.should == true
+      end
+      raised.should == true
+    end
+
+    it "enforces operation timeout on scp_dl" do
+      raised = false
+      begin
+        r = Net::SSH::Simple.scp_dl('localhost', '/tmp/ssh_test_in0',
+                                    '/tmp/ssh_test_out0', {:operation_timeout=>1}) \
+        do |sent,total|
+          sleep 5
+        end
       rescue => e
         raised = true
         e.to_s.should match /^execution expired @ .*/
@@ -57,6 +104,10 @@ describe Net::SSH::Simple do
 
     it "interprets timeout=0 as no timeout" do
       Net::SSH::Simple.ssh('localhost', 'sleep 2', {:timeout => 0})
+    end
+
+    it "interprets operation_timeout=0 as no timeout" do
+      Net::SSH::Simple.ssh('localhost', 'sleep 2', {:operation_timeout => 0})
     end
 
     it "fails gently" do
@@ -181,6 +232,13 @@ describe Net::SSH::Simple do
   describe "synchronous block syntax" do
     it "returns a result" do
       Net::SSH::Simple.sync do
+        ssh('localhost', 'true').success.should == true
+        # see coverage-report to see if session#shutdown! was exercised
+      end
+    end
+
+    it "force closes" do
+      Net::SSH::Simple.sync({:close_timeout => true}) do
         ssh('localhost', 'true').success.should == true
       end
     end
@@ -317,7 +375,7 @@ describe Net::SSH::Simple do
     end
 
     it "handles signals" do
-      victim = Net::SSH::Simple.async do
+      victim = Net::SSH::Simple.async({:timeout => 10}) do
         begin
           ssh('localhost', 'sleep 1020304157')
         rescue => e
@@ -325,12 +383,14 @@ describe Net::SSH::Simple do
         end
       end
 
-      killer = Net::SSH::Simple.async do
+      killer = Net::SSH::Simple.async({:operation_timeout => 5}) do
+        sleep 1 while 0 != ssh('localhost', "pgrep -f 'sleep 1020304157'").exit_code
         ssh('localhost', "pkill -f 'sleep 1020304157'")
       end
 
       k = killer.value
       k.success.should == true
+      k.exit_code.should == 0
 
       v = victim.value
       v.to_s.should match /Killed by SIGTERM @ .*/
@@ -610,7 +670,8 @@ describe Net::SSH::Simple do
         end
       end
 
-      killer = Net::SSH::Simple.async do
+      killer = Net::SSH::Simple.async({:operation_timeout => 5}) do
+        sleep 1 while 0 != ssh('localhost', "pgrep -f 'sleep 1020304157'").exit_code
         ssh('localhost', "pkill -f 'sleep 1020304157'")
       end
 
@@ -649,9 +710,11 @@ describe Net::SSH::Simple do
         end
       end
 
-      killer = Net::SSH::Simple.async do
+      killer = Net::SSH::Simple.async({:operation_timeout => 5}) do
+        sleep 1 while 0 != ssh('localhost', "pgrep -f 'sleep 1020304157'").exit_code
         ssh('localhost', "pkill -f 'sleep 1020304157'")
       end
+
 
       k = killer.value
       k.success.should == true
