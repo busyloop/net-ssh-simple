@@ -456,8 +456,6 @@ module Net
       #  (0 = terminate immediately).
       #
       # @option opts [String] :user
-      #
-      # @option opts [String] :user
       #  the username to log in as
       #
       # @option opts [String/Array] :user_known_hosts_file
@@ -471,7 +469,7 @@ module Net
       #  :debug, :info, :warn, :error, and :fatal are also supported and are translated
       #  to the corresponding Logger constant.
       #
-      # @see http://net-ssh.github.com/ssh/v2/api/classes/Net/SSH/Config.html
+      # @see http://net-ssh.github.com/ssh/v2/api/classes/Net/SSH.html#M000002 
       #      Net::SSH documentation for the 'opts'-hash
       def ssh(host, cmd, opts={}, &block)
         opts = @opts.merge(opts)
