@@ -45,7 +45,7 @@ module Net
     #     ssh    'example7.com', 'echo "Hello World B."'
     #   end
     #   r1 = t1.value # wait for t1 to finish and grab return value
-    #   r2 = t2.value # wait for t1 to finish and grab return value
+    #   r2 = t2.value # wait for t2 to finish and grab return value
     #
     #   puts r1.stdout #=> "Hello World A."
     #   puts r2.stdout #=> "Hello World B."
