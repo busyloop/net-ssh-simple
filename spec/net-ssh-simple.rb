@@ -227,6 +227,18 @@ describe Net::SSH::Simple do
       r.op.should == :scp
       Digest::MD5.file('/tmp/ssh_test_in0').should == Digest::MD5.file('/tmp/ssh_test_out0')
     end
+
+    it "supports async" do
+      a = @s.async do
+        ssh('localhost', 'sleep 1; echo hello')
+      end
+      b = @s.async do
+        ssh('localhost', 'sleep 2; echo hella')
+      end
+      a.value.stdout.should == "hello\n"
+      b.value.stdout.should == "hella\n"
+    end
+
   end
 
   describe "synchronous block syntax" do

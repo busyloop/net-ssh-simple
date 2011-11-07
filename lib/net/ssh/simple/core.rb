@@ -541,6 +541,17 @@ module Net
       end
 
       #
+      # Spawn a Thread to perform a sequence of ssh/scp operations.
+      #
+      # @param [Block] block
+      # @param opts (see Net::SSH::Simple#ssh)
+      # @return [Thread] Thread executing the SSH-Block.
+      #
+      def async(opts={}, &block)
+        self.class.async(opts, &block)
+      end
+
+      #
       # Perform a sequence of ssh/scp operations.
       #
       # @param opts (see Net::SSH::Simple#ssh)
