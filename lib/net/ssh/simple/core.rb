@@ -451,6 +451,10 @@ module Net
       #   maximum time before aborting an operation (0 = disable).
       #   you may use this to guard against run-away processes.
       #
+      # @option opts [Integer] :keepalive_interval (60)
+      #   send keep-alive probes at this interval to prevent connections
+      #   from timing out unexpectedly.
+      #
       # @option opts [Integer] :close_timeout (5)
       #  grace-period on close before the connection will be terminated forcefully
       #  (0 = terminate immediately).
@@ -512,7 +516,7 @@ module Net
               block.call(:start, ch, nil) if block
             end
           end
-          wait_for_channel session, channel, @result, opts[:timeout]
+          wait_for_channel session, channel, @result, opts
           @result[:finish_at] = Time.new
           block.call(:finish, channel, nil) if block
           @result
@@ -585,7 +589,7 @@ module Net
 
 
       private
-      EXTRA_OPTS = [:operation_timeout, :close_timeout]
+      EXTRA_OPTS = [:operation_timeout, :close_timeout, :keepalive_interval]
 
       def with_session(host, opts={}, &block)
         opts[:timeout] ||= 60
@@ -593,6 +597,7 @@ module Net
         opts[:operation_timeout] ||= 3600
         opts[:operation_timeout] = 2**32 if opts[:operation_timeout] == 0
         opts[:close_timeout] ||= 5
+        opts[:keepalive_interval] ||= 60
         begin
           net_ssh_opts = opts.reject{|k,v| EXTRA_OPTS.include? k }
           Timeout.timeout(opts[:operation_timeout]) do
@@ -611,10 +616,16 @@ module Net
         end
       end
 
-      def wait_for_channel(session, channel, result, timeout)
+      def wait_for_channel(session, channel, result, opts)
         session.loop(1) do
-          if timeout < Time.now - result[:last_event_at]
+          if opts[:timeout] < Time.now - result[:last_event_at]
             raise Timeout::Error, 'idle timeout'
+          end
+
+          # Send keep-alive probes at the configured interval.
+          if opts[:keepalive_interval] < Time.now.to_i - (@result[:last_keepalive_at]||0).to_i
+            session.send_global_request('keep-alive@openssh.com')
+            @result[:last_keepalive_at] = Time.now
           end
           channel.active?
         end
@@ -635,7 +646,7 @@ module Net
             @result[:last_event_at] = Time.new
             block.call(sent, total) unless block.nil?
           end
-          wait_for_channel session, channel, @result, opts[:timeout]
+          wait_for_channel session, channel, @result, opts
           @result[:finish_at] = Time.new
           @result[:success] = @result[:sent] == @result[:total]
           @result
@@ -669,14 +680,15 @@ module Net
       # @attr [String] host Hostname/IP address
       # @attr [Symbol] op :ssh or :scp
       # @attr [String] cmd Shell command (SSH only)
-      # @attr [Time] start_at Operation start timestamp
-      # @attr [Time] finish_at Operation finish timestamp
+      # @attr [Time] start_at Timestamp of operation start
+      # @attr [Time] finish_at Timestamp of operation finish
+      # @attr [Time] last_keepalive_at Timestamp of last keepalive (if any)
       # @attr [Time] last_event_at Timestamp of last activity
-      # @attr [Boolean] timed_out Set to true if the operation timed out
+      # @attr [Boolean] timed_out True if the operation timed out
       # @attr [String] stdout Output to stdout (SSH only)
       # @attr [String] stderr Output to stderr (SSH only)
       # @attr [boolean] success
-      # @attr [String] exit_code UNIX exit code of the remote command (SSH only)
+      # @attr [String] exit_code UNIX exit code (SSH only)
       # @attr [Integer] total Size of requested file (in bytes, SCP only)
       # @attr [Integer] sent Number of bytes transferred (SCP only)
       # @attr [String] exit_signal

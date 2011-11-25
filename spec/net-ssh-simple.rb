@@ -45,7 +45,7 @@ describe Net::SSH::Simple do
     it "enforces idle timeout" do
       raised = false
       begin
-        r = Net::SSH::Simple.ssh('localhost', 'sleep 60', {:timeout => 1})
+        r = Net::SSH::Simple.ssh('localhost', 'sleep 60', {:timeout => 5, :keepalive_interval => 1})
       rescue => e
         raised = true
         e.to_s.should match /^idle timeout @ .*/
@@ -124,6 +124,14 @@ describe Net::SSH::Simple do
 
     it "returns a result" do
       Net::SSH::Simple.ssh('localhost', 'true').success.should == true
+    end
+
+    it "sends keep-alive" do
+      r = Net::SSH::Simple.ssh('localhost', 'sleep 3', {:keepalive_interval=>1})
+      (Time.now - r.last_keepalive_at).to_i.should < 3
+
+      r = Net::SSH::Simple.ssh('localhost', 'sleep 3', {:keepalive_interval=>5})
+      (Time.now - r.last_keepalive_at).to_i.should > 2
     end
 
     it "recognizes exit-codes" do
