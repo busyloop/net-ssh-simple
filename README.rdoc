@@ -2,6 +2,13 @@
 
 Net::SSH::Simple is a simple wrapper around Net::SSH and Net::SCP.
 
+It greatly reduces the amount of boilerplate code that you need
+to write for handling SSH-connections and thereby prevents many common
+mistakes related to error-handling, threading, timeouts and keep-alive.
+
+It also makes it very easy to talk to many hosts in parallel
+synchronously or asynchronously.
+
 == Features
 
 * Friendly, flexible API for SSH and SCP (synchronous and asynchronous)
