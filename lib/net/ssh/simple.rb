@@ -560,6 +560,7 @@ module Net
       # @return [Thread] Thread executing the SSH-Block.
       #
       def async(opts={}, &block)
+        opts = @opts.merge(opts)
         self.class.async(opts, &block)
       end
 

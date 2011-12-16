@@ -440,6 +440,30 @@ describe Net::SSH::Simple do
       s.close
     end
 
+    it "works with instance syntax + async" do
+      s = Net::SSH::Simple.new({:timeout => 7})
+      t = s.async({:operation_timeout => 11}) do
+        r = ssh('localhost', 'date', {:rekey_packet_limit => 42})
+        r.opts[:timeout].should == 7
+        r.opts[:rekey_packet_limit].should == 42
+        r.opts[:operation_timeout].should == 11
+
+        r = scp_ul('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0',
+                   {:rekey_packet_limit => 42})
+        r.opts[:timeout].should == 7
+        r.opts[:rekey_packet_limit].should == 42
+        r.opts[:operation_timeout].should == 11
+
+        r = scp_dl('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0',
+                   {:rekey_packet_limit => 42})
+        r.opts[:timeout].should == 7
+        r.opts[:rekey_packet_limit].should == 42
+        r.opts[:operation_timeout].should == 11
+        :happy
+      end
+      t.value.should == :happy
+    end
+
     it "works with synchronous block syntax" do
       r = Net::SSH::Simple.sync({:timeout => 7}) do
         r = ssh('localhost', 'date', {:rekey_packet_limit => 42})
