@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.add_dependency "net-ssh", "~> 2.2.1"
   s.add_dependency "net-scp", "~> 1.0.4"
   s.add_dependency "blockenspiel", "~> 0.4.3"
-  s.add_dependency "hashie", "~> 1.1.0"
+  s.add_dependency "hashie", ">= 1.1.0"
 
   s.add_development_dependency "rake", "~> 0.9.2.2"
   s.add_development_dependency "rspec"
