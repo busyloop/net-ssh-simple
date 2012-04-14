@@ -65,6 +65,70 @@ synchronously or asynchronously.
  s.scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
  s.close
 
+== Thread safety
+
+Do _not_ share a Net::SSH::Simple instance across threads.
+
+That's the only rule to watch out for. Other than that you're
+free to use Net::SSH::Simple concurrently in different Threads.
+
+If you want to use the instance syntax in a threaded environment
+then the following idiom will provide the best performance:
+
+ require 'net/ssh/simple'
+ 
+ # Create and re-use one instance per thread, with a default username.
+ def ss
+   Thread.current[:simplessh] ||= Net::SSH::Simple.new({:user => 'bob'})
+ end
+
+ # Strictly optional. You may use this method to close the
+ # SSH connections early. Otherwise our instance will tear
+ # down automatically when the enclosing thread finishes.
+ def ss_close
+   ss.close
+   Thread.current[:simplessh] = nil
+ end
+
+ # By sharing the same Net::SSH::Simple instance across calls
+ # to this method our ssh transport connections get re-used
+ # when the same remote host is accessed multiple times.
+ def do_something_involving_ssh
+   # The connections to example1-5.com are re-used across
+   # multiple calls to this method.
+   ss.ssh    'example1.com', 'echo "Hello World."', {:user => 'not_bob'}
+   ss.scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
+   ss.scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
+
+   t = ss.async do
+     scp_ul 'example4.com', '/tmp/local_foo', '/tmp/remote_bar'
+   end
+
+   ss.sync do
+     scp_ul 'example5.com', '/tmp/local_foo', '/tmp/remote_bar'
+   end
+
+   # wait for our async call to finish
+   t.value
+
+   # Below we explicitly do _not_ use the shared instance
+   # because we want these connections to close immediately
+   # after the block finishes. This is useful when you know
+   # that some hosts will be connected to only once during
+   # the lifetime of a thread (there's no point in keeping
+   # these open).
+   Net::SSH::Simple.sync do
+     # opens connections to example8.com, example9.com
+     ssh 'example8.com', 'echo "Hello World."'
+     ssh 'example9.com', 'echo "Hello World."'
+
+     # connections are reused
+     ssh 'example8.com', 'echo "World Hello."'
+     ssh 'example9.com', 'echo "World Hello."'
+
+     # both connections close at the end of this block
+   end
+ end
 
 == Documentation
 
