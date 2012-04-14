@@ -25,6 +25,10 @@ synchronously or asynchronously.
 
 == Examples
 
+Note: If you are reading this on github then {click here}[http://rubydoc.info/gems/net-ssh-simple/file/README.rdoc] for a more readable
+version with syntax highlighting.
+
+
 === Block Syntax (synchronous)
 
  require 'net/ssh/simple'
