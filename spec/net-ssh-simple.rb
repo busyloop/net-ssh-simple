@@ -1,4 +1,6 @@
-require 'cover_me'
+require 'simplecov'
+SimpleCov.start
+
 require 'net/ssh/simple'
 require 'digest/md5'
 require 'securerandom'
