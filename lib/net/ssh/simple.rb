@@ -598,7 +598,7 @@ module Net
 
 
       private
-      EXTRA_OPTS = [:operation_timeout, :close_timeout, :keepalive_interval]
+      EXTRA_OPTS = [:operation_timeout, :close_timeout, :keepalive_interval, :scp_src, :scp_dst]
 
       def with_session(host, opts={}, &block)
         opts[:timeout] ||= 60
@@ -641,15 +641,15 @@ module Net
       end
 
       def scp(mode, host, src, dst, opts={}, &block)
+        opts[:scp_src] = src
+        opts[:scp_dst] = dst
         @result = Result.new(
           { :op => :scp, :host => host, :opts => opts, :cmd => :scp_dl,
-            :last_event_at => Time.new, :start_at => Time.new, 
-            :src => src, :dst  => dst, :success => false
+            :last_event_at => Time.new, :start_at => Time.new, :success => false
           } )
         with_session(host, opts) do |session|
           lt = 0
           channel = session.scp.send(mode, src, dst) do |ch, name, sent, total|
-            @result[:name] ||= name
             @result[:total] ||= total
             @result[:sent] = sent
             @result[:last_event_at] = Time.new
