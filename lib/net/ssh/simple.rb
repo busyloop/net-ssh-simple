@@ -679,7 +679,7 @@ module Net
         end
 
         def to_s
-          "#{super[0]} @ #{super[1]}"
+          "#{@wrapped} @ #{@result}"
         end
       end
 
