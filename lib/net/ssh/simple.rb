@@ -22,7 +22,7 @@
 
 require 'net/ssh/simple/version'
 require 'blockenspiel'
-require 'hashie'
+require 'hashie/dash'
 require 'timeout'
 require 'net/ssh'
 require 'net/scp'
@@ -700,10 +700,30 @@ module Net
       # @attr [String] exit_code UNIX exit code (SSH only)
       # @attr [Integer] total Size of requested file (in bytes, SCP only)
       # @attr [Integer] sent Number of bytes transferred (SCP only)
+      # @attr [Hash] opts The options that the operation was parametrized with
+      # @attr [Exception] exception Exception that occurred during this operation (if any)
       # @attr [String] exit_signal
       #   Only present if the remote command terminated due to a signal (SSH only)
       #
-      class Result < Hashie::Mash; end
+      class Result < Hashie::Dash
+        property :host
+        property :op
+        property :cmd
+        property :start_at
+        property :finish_at
+        property :last_keepalive_at
+        property :last_event_at
+        property :timed_out
+        property :stdout, :default => ''
+        property :stderr, :default => ''
+        property :success, :default => false
+        property :exit_code
+        property :total
+        property :sent
+        property :opts
+        property :exception
+        property :exit_signal
+      end
     end
   end
 end
