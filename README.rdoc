@@ -1,3 +1,5 @@
+{<img src="https://gemnasium.com/busyloop/net-ssh-simple.png" alt="Dependency Status" />}[https://gemnasium.com/busyloop/net-ssh-simple]
+
 = Net::SSH::Simple
 
 Net::SSH::Simple is a simple wrapper around Net::SSH and Net::SCP.
@@ -75,6 +77,7 @@ Do _not_ share a Net::SSH::Simple instance across threads.
 
 That's the only rule to watch out for. Other than that you're
 free to use Net::SSH::Simple concurrently in different Threads.
+If you only use the block-syntax then you have nothing to worry about.
 
 If you want to use the instance syntax in a threaded environment
 then the following idiom will provide the best performance:
@@ -137,6 +140,17 @@ then the following idiom will provide the best performance:
 == Documentation
 
 See {Net::SSH::Simple}[http://rubydoc.info/gems/net-ssh-simple/Net/SSH/Simple] for more examples and full API.
+
+== Running the test suite
+
+The spec-suite makes SSH-connections to localhost, thus you need to have
+your own ssh-key authorized in order to run it. Please see the comment
+at the top of 'spec/net-ssh-simple.rb' on how to set this up.
+
+When your host is properly configured the following command should pass:
+
+  $ bundle exec rake
+
 
 == License (MIT)
 
