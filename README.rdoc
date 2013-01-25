@@ -47,11 +47,11 @@ version with syntax highlighting.
 
  t1 = Net::SSH::Simple.async do
    scp_put 'example1.com', '/tmp/local_foo', '/tmp/remote_bar'
-   ssh    'example3.com', 'echo "Hello World A."'
+   ssh     'example3.com', 'echo "Hello World A."'
  end
  t2 = Net::SSH::Simple.async do
    scp_get 'example6.com', '/tmp/remote_foo', '/tmp/local_bar'
-   ssh    'example7.com', 'echo "Hello World B."'
+   ssh     'example7.com', 'echo "Hello World B."'
  end
  r1 = t1.value # wait for t1 to finish and grab return value
  r2 = t2.value # wait for t2 to finish and grab return value
@@ -64,7 +64,7 @@ version with syntax highlighting.
  require 'net/ssh/simple'
 
  s = Net::SSH::Simple.new
- s.ssh    'example1.com', 'echo "Hello World."'
+ s.ssh     'example1.com', 'echo "Hello World."'
  s.scp_put 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
  s.scp_get 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
  s.close
@@ -101,7 +101,7 @@ then the following idiom will provide the best performance:
  def do_something_involving_ssh
    # The connections to example1-5.com are re-used across
    # multiple calls to this method.
-   ss.ssh    'example1.com', 'echo "Hello World."', {:user => 'not_bob'}
+   ss.ssh     'example1.com', 'echo "Hello World."', {:user => 'not_bob'}
    ss.scp_put 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
    ss.scp_get 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
 
