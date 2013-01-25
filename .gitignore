@@ -1,3 +1,4 @@
+.rbenv-version
 *.gem
 .bundle
 Gemfile.lock
