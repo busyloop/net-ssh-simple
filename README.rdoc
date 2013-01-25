@@ -37,8 +37,8 @@ version with syntax highlighting.
    r = ssh 'example1.com', 'echo "Hello World."'
    puts r.stdout #=> "Hello World."
 
-   scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
-   scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
+   scp_put 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
+   scp_get 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
  end
 
 === Block Syntax (asynchronous)
@@ -46,11 +46,11 @@ version with syntax highlighting.
  require 'net/ssh/simple'
 
  t1 = Net::SSH::Simple.async do
-   scp_ul 'example1.com', '/tmp/local_foo', '/tmp/remote_bar'
+   scp_put 'example1.com', '/tmp/local_foo', '/tmp/remote_bar'
    ssh    'example3.com', 'echo "Hello World A."'
  end
  t2 = Net::SSH::Simple.async do
-   scp_dl 'example6.com', '/tmp/remote_foo', '/tmp/local_bar'
+   scp_get 'example6.com', '/tmp/remote_foo', '/tmp/local_bar'
    ssh    'example7.com', 'echo "Hello World B."'
  end
  r1 = t1.value # wait for t1 to finish and grab return value
@@ -65,8 +65,8 @@ version with syntax highlighting.
 
  s = Net::SSH::Simple.new
  s.ssh    'example1.com', 'echo "Hello World."'
- s.scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
- s.scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
+ s.scp_put 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
+ s.scp_get 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
  s.close
 
 == Thread safety
@@ -102,15 +102,15 @@ then the following idiom will provide the best performance:
    # The connections to example1-5.com are re-used across
    # multiple calls to this method.
    ss.ssh    'example1.com', 'echo "Hello World."', {:user => 'not_bob'}
-   ss.scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
-   ss.scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
+   ss.scp_put 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
+   ss.scp_get 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
 
    t = ss.async do
-     scp_ul 'example4.com', '/tmp/local_foo', '/tmp/remote_bar'
+     scp_put 'example4.com', '/tmp/local_foo', '/tmp/remote_bar'
    end
 
    ss.sync do
-     scp_ul 'example5.com', '/tmp/local_foo', '/tmp/remote_bar'
+     scp_put 'example5.com', '/tmp/local_foo', '/tmp/remote_bar'
    end
 
    # wait for our async call to finish

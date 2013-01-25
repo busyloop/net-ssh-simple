@@ -38,18 +38,18 @@ module Net
     #     puts r.stdout    #=> "Hello World."
     #     puts r.exit_code #=> 0
     #
-    #     scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
-    #     scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
+    #     scp_put 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
+    #     scp_get 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
     #   end
     #
     # @example
     #   # Block Syntax (asynchronous)
     #   t1 = Net::SSH::Simple.async do
-    #     scp_ul 'example1.com', '/tmp/local_foo', '/tmp/remote_bar'
+    #     scp_put 'example1.com', '/tmp/local_foo', '/tmp/remote_bar'
     #     ssh    'example3.com', 'echo "Hello World A."'
     #   end
     #   t2 = Net::SSH::Simple.async do
-    #     scp_dl 'example6.com', '/tmp/remote_foo', '/tmp/local_bar'
+    #     scp_get 'example6.com', '/tmp/remote_foo', '/tmp/local_bar'
     #     ssh    'example7.com', 'echo "Hello World B."'
     #   end
     #   r1 = t1.value # wait for t1 to finish and grab return value
@@ -61,18 +61,18 @@ module Net
     # @example
     #   # Using an instance
     #   s = Net::SSH::Simple.new
-    #   s.ssh    'example1.com', 'echo "Hello World."'
-    #   s.scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
-    #   s.scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
+    #   s.ssh     'example1.com', 'echo "Hello World."'
+    #   s.scp_put 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
+    #   s.scp_get 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
     #   s.close
     #
     # @example
     #   # Using no instance
     #   # Note: This will create a new connection for each operation!
     #   #       Use instance- or block-syntax for better performance.
-    #   Net::SSH::Simple.ssh    'example1.com', 'echo "Hello World."'
-    #   Net::SSH::Simple.scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
-    #   Net::SSH::Simple.scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
+    #   Net::SSH::Simple.ssh     'example1.com', 'echo "Hello World."'
+    #   Net::SSH::Simple.scp_put 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
+    #   Net::SSH::Simple.scp_get 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
     #
     # @example
     #   # Error Handling with Block Syntax (synchronous)
@@ -83,12 +83,12 @@ module Net
     #         puts "Success! I Helloed World."
     #       end
     #
-    #       r = scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
+    #       r = scp_put 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
     #       if r.success and r.sent == r.total
     #         puts "Success! Uploaded #{r.sent} of #{r.total} bytes."
     #       end
     #
-    #       r = scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
+    #       r = scp_get 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
     #       if r.success and r.sent == r.total
     #         puts "Success! Downloaded #{r.sent} of #{r.total} bytes."
     #       end
@@ -108,9 +108,9 @@ module Net
     #
     #   a = Net::SSH::Simple.async do
     #     begin
-    #       ssh    'example1.com', 'echo "Hello World."'
-    #       scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
-    #       scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
+    #       ssh     'example1.com', 'echo "Hello World."'
+    #       scp_put 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
+    #       scp_get 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
     #     rescue Net::SSH::Simple::Error => e
     #       # return our exception to the parent thread
     #       e
@@ -132,12 +132,12 @@ module Net
     #       puts "Success! I Helloed World."
     #     end
     #
-    #     r = s.scp_ul 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
+    #     r = s.scp_put 'example2.com', '/tmp/local_foo', '/tmp/remote_bar'
     #     if r.success and r.sent == r.total
     #       puts "Success! Uploaded #{r.sent} of #{r.total} bytes."
     #     end
     #
-    #     r = s.scp_dl 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
+    #     r = s.scp_get 'example3.com', '/tmp/remote_foo', '/tmp/local_bar'
     #     if r.success and r.sent == r.total
     #       puts "Success! Downloaded #{r.sent} of #{r.total} bytes."
     #     end
@@ -161,13 +161,13 @@ module Net
     #   Net::SSH::Simple.sync({:user => 'tom', :port => 1234}) do
     #     # Both commands will inherit :user and :port
     #     ssh('example1.com', 'echo "Hello World."', {:password => 'jerry'})
-    #     scp_ul('example2.com', '/tmp/a', '/tmp/a', {:password => 's3cr3t'})
+    #     scp_put('example2.com', '/tmp/a', '/tmp/a', {:password => 's3cr3t'})
     #   end
     #
     # @example
     #   # Using the SCP progress callback
     #   Net::SSH::Simple.sync do
-    #     scp_ul 'example1.com', '/tmp/local_foo', '/tmp/remote_bar' do |sent, total|
+    #     scp_put 'example1.com', '/tmp/local_foo', '/tmp/remote_bar' do |sent, total|
     #       puts "Bytes uploaded: #{sent} of #{total}"
     #     end
     #   end
@@ -278,20 +278,20 @@ module Net
       #
       # @example
       #   # SCP Upload
-      #   Net::SSH::Simple.scp_ul('localhost', '/tmp/local_foo', '/tmp/remote_bar')
+      #   Net::SSH::Simple.scp_put('localhost', '/tmp/local_foo', '/tmp/remote_bar')
       #
       # @example
       #   # Pass a block to monitor progress
-      #   Net::SSH::Simple.scp_ul('localhost', '/tmp/local_foo', '/tmp/remote_bar') do |sent, total|
+      #   Net::SSH::Simple.scp_put('localhost', '/tmp/local_foo', '/tmp/remote_bar') do |sent, total|
       #     puts "Bytes uploaded: #{sent} of #{total}"
       #   end
       #
-      # @param (see Net::SSH::Simple#scp_ul)
+      # @param (see Net::SSH::Simple#scp_put)
       # @raise [Net::SSH::Simple::Error]
       # @return [Net::SSH::Simple::Result] Result
-      def self.scp_ul(*args, &block)
+      def self.scp_put(*args, &block)
         s = self.new
-        r = s.scp_ul(*args, &block)
+        r = s.scp_put(*args, &block)
         s.close
         r
       end
@@ -302,23 +302,35 @@ module Net
       #
       # @example
       #   # SCP Download
-      #   Net::SSH::Simple.scp_dl('localhost', '/tmp/remote_foo', '/tmp/local_bar')
+      #   Net::SSH::Simple.scp_get('localhost', '/tmp/remote_foo', '/tmp/local_bar')
       #
       # @example
       #   # Pass a block to monitor progress
-      #   Net::SSH::Simple.scp_dl('localhost', '/tmp/remote_foo', '/tmp/local_bar') do |sent, total|
+      #   Net::SSH::Simple.scp_get('localhost', '/tmp/remote_foo', '/tmp/local_bar') do |sent, total|
       #     puts "Bytes downloaded: #{sent} of #{total}"
       #   end
       #
-      # @param (see Net::SSH::Simple#scp_dl)
+      # @param (see Net::SSH::Simple#scp_get)
       # @raise [Net::SSH::Simple::Error]
       # @return [Net::SSH::Simple::Result] Result
       #
-      def self.scp_dl(*args, &block)
+      def self.scp_get(*args, &block)
         s = self.new
-        r = s.scp_dl(*args, &block)
+        r = s.scp_get(*args, &block)
         s.close
         r
+      end
+
+      # @deprecated Use scp_put instead.
+      def self.scp_ul(*args, &block)
+        warn "[DEPRECATION] Net::SSH::Simple.scp_ul is deprecated. Please use .scp_put instead (usage is identical, the method was only renamed)."
+        self.scp_put(*args, &block)
+      end
+
+      # @deprecated Use scp_get instead.
+      def self.scp_dl(*args, &block)
+        warn "[DEPRECATION] Net::SSH::Simple.scp_dl is deprecated. Please use .scp_get instead (usage is identical, the method was only renamed)."
+        self.scp_get(*args, &block)
       end
 
       # 
@@ -327,12 +339,13 @@ module Net
       # existing connections for optimal performance.
       #
       # @param [String] host Destination hostname or ip-address
-      # @param [String] cmd  Shell command to execute
+      # @param [String] src Source path (on localhost)
+      # @param [String] dst Destination path (on remote host)
       # @param opts (see Net::SSH::Simple#ssh)
-      # @param [Block] &block Progress callback (optional)
+      # @param [Block] block Progress callback (optional)
       # @return [Net::SSH::Simple::Result] Result
       #
-      def scp_ul(host, src, dst, opts={}, &block)
+      def scp_put(host, src, dst, opts={}, &block)
         opts = @opts.merge(opts)
         scp(:upload, host, src, dst, opts, &block)
       end
@@ -343,15 +356,28 @@ module Net
       # existing connections for optimal performance.
       # 
       # @param [String] host Destination hostname or ip-address
-      # @param [String] cmd  Shell command to execute
+      # @param [String] src Source path (on remote host)
+      # @param [String] dst Destination path (on localhost)
       # @param opts (see Net::SSH::Simple#ssh)
-      # @param [Block] &block Progress callback (optional)
+      # @param [Block] block Progress callback (optional)
       # @return [Net::SSH::Simple::Result] Result
-      # @see Net::SSH::Simple#scp_ul
+      # @see Net::SSH::Simple#scp_put
       #
-      def scp_dl(host, src, dst, opts={}, &block)
+      def scp_get(host, src, dst, opts={}, &block)
         opts = @opts.merge(opts)
         scp(:download, host, src, dst, opts, &block)
+      end
+
+      # @deprecated Use scp_put instead.
+      def scp_ul(host, src, dst, opts={}, &block)
+        warn "[DEPRECATION] Net::SSH::Simple#scp_ul is deprecated. Please use #scp_put instead (usage is identical, the method was only renamed)."
+        scp_put(host, src, dst, opts, &block)
+      end
+
+      # @deprecated Use scp_get instead.
+      def scp_dl(host, src, dst, opts={}, &block)
+        warn "[DEPRECATION] Net::SSH::Simple#scp_dl is deprecated. Please use #scp_get instead (usage is identical, the method was only renamed)."
+        scp_get(host, src, dst, opts, &block)
       end
 
       #
@@ -362,7 +388,7 @@ module Net
       # @return [Net::SSH::Simple::Result] Result
       # @param [String] host Destination hostname or ip-address
       # @param [String] cmd  Shell command to execute
-      # @param [Block]  &block Use the event-API (see example above)
+      # @param [Block]  block Use the event-API (see example above)
       # @param [Hash]   opts SSH options
       # @option opts [Array] :auth_methods
       #  an array of authentication methods to try
@@ -644,7 +670,7 @@ module Net
         opts[:scp_src] = src
         opts[:scp_dst] = dst
         @result = Result.new(
-          { :op => :scp, :host => host, :opts => opts, :cmd => :scp_dl,
+          { :op => :scp, :host => host, :opts => opts, :cmd => mode,
             :last_event_at => Time.new, :start_at => Time.new, :success => false
           } )
         with_session(host, opts) do |session|
