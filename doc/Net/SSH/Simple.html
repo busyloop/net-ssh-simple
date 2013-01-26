@@ -6,7 +6,7 @@
 <title>
   Class: Net::SSH::Simple
   
-    &mdash; Documentation by YARD 0.8.3
+    &mdash; Documentation by YARD 0.8.0
   
 </title>
 
@@ -346,10 +346,25 @@
   
 </ul>
 
-</div>
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Simple/Error.html" title="Net::SSH::Simple::Error (class)">Error</a></span>, <span class='object_link'><a href="Simple/Result.html" title="Net::SSH::Simple::Result (class)">Result</a></span>
+    
+  
+</p>
+
   <h2>Constant Summary</h2>
   
     <dl class="constants">
+      
+        <dt id="EXTRA_OPTS-constant" class="">EXTRA_OPTS =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbracket'>[</span><span class='symbol'>:operation_timeout</span><span class='comma'>,</span> <span class='symbol'>:close_timeout</span><span class='comma'>,</span> <span class='symbol'>:keepalive_interval</span><span class='comma'>,</span> <span class='symbol'>:scp_src</span><span class='comma'>,</span> <span class='symbol'>:scp_dst</span><span class='rbracket'>]</span></pre></dd>
       
         <dt id="VERSION-constant" class="">VERSION =
           
@@ -837,6 +852,7 @@
     
       
       <span id=""></span>
+      <span id="result-instance_method"></span>
       <div class="method_details first">
   <h3 class="signature first" id="result-instance_method">
   
@@ -2365,11 +2381,9 @@ optimal performance.</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>an array of authentication methods to try</p>
 </div>
-          
         </li>
       
         <li>
@@ -2378,11 +2392,9 @@ optimal performance.</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>the compression algorithm to use, or true to use whatever is supported.</p>
 </div>
-          
         </li>
       
         <li>
@@ -2391,11 +2403,9 @@ optimal performance.</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>the compression level to use when sending data</p>
 </div>
-          
         </li>
       
         <li>
@@ -2407,13 +2417,11 @@ optimal performance.</p>
               <tt>true</tt>
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>set to true to load the default OpenSSH opts files (~/.ssh/opts,
 /etc/ssh_opts), or to false to not load them, or to a file-name (or array
 of file-names) to load those specific configuration files.</p>
 </div>
-          
         </li>
       
         <li>
@@ -2422,11 +2430,9 @@ of file-names) to load those specific configuration files.</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>the encryption cipher (or ciphers) to use</p>
 </div>
-          
         </li>
       
         <li>
@@ -2435,11 +2441,9 @@ of file-names) to load those specific configuration files.</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>set to true if you want the SSH agent connection to be forwarded</p>
 </div>
-          
         </li>
       
         <li>
@@ -2451,12 +2455,10 @@ of file-names) to load those specific configuration files.</p>
               <tt>['/etc/ssh/known_hosts'</tt>, <tt>'/etc/ssh/known_hosts2']</tt>
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>the location of the global known hosts file. Set to an array if you want to
 specify multiple global known hosts files.</p>
 </div>
-          
         </li>
       
         <li>
@@ -2465,11 +2467,9 @@ specify multiple global known hosts files.</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>the hmac algorithm (or algorithms) to use</p>
 </div>
-          
         </li>
       
         <li>
@@ -2478,11 +2478,9 @@ specify multiple global known hosts files.</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>the host key algorithm (or algorithms) to use</p>
 </div>
-          
         </li>
       
         <li>
@@ -2491,12 +2489,10 @@ specify multiple global known hosts files.</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>the host name to use when looking up or adding a host to a known_hosts
 dictionary file</p>
 </div>
-          
         </li>
       
         <li>
@@ -2505,14 +2501,12 @@ dictionary file</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>the real host name or IP to log into. This is used instead of the host
 parameter, and is primarily only useful when specified in an SSH
 configuration file. It lets you specify an alias, similarly to adding an
 entry in /etc/hosts but without needing to modify /etc/hosts.</p>
 </div>
-          
         </li>
       
         <li>
@@ -2521,11 +2515,9 @@ entry in /etc/hosts but without needing to modify /etc/hosts.</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>the key exchange algorithm (or algorithms) to use</p>
 </div>
-          
         </li>
       
         <li>
@@ -2534,12 +2526,10 @@ entry in /etc/hosts but without needing to modify /etc/hosts.</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>an array of file names of private keys to use for publickey and hostbased
 authentication</p>
 </div>
-          
         </li>
       
         <li>
@@ -2548,12 +2538,10 @@ authentication</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>an array of strings, with each element of the array being a raw private key
 in PEM format.</p>
 </div>
-          
         </li>
       
         <li>
@@ -2562,13 +2550,11 @@ in PEM format.</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>set to true to use only private keys from keys and key_data parameters,
 even if ssh-agent offers more identities. This option is intended for
 situations where ssh-agent offers many different identites.</p>
 </div>
-          
         </li>
       
         <li>
@@ -2577,11 +2563,9 @@ situations where ssh-agent offers many different identites.</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>the logger instance to use when logging</p>
 </div>
-          
         </li>
       
         <li>
@@ -2590,12 +2574,10 @@ situations where ssh-agent offers many different identites.</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>either true, false, or :very, specifying how strict host-key verification
 should be</p>
 </div>
-          
         </li>
       
         <li>
@@ -2607,12 +2589,10 @@ should be</p>
               <tt>nil</tt>
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>the passphrase to use when loading a private key (default is nil, for no
 passphrase)</p>
 </div>
-          
         </li>
       
         <li>
@@ -2621,11 +2601,9 @@ passphrase)</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>the password to use to login</p>
 </div>
-          
         </li>
       
         <li>
@@ -2634,11 +2612,9 @@ passphrase)</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>the port to use when connecting to the remote host</p>
 </div>
-          
         </li>
       
         <li>
@@ -2647,12 +2623,10 @@ passphrase)</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>a hash of key/value pairs to add to the new connection's properties (see
 Net::SSH::Connection::Session#properties)</p>
 </div>
-          
         </li>
       
         <li>
@@ -2661,11 +2635,9 @@ Net::SSH::Connection::Session#properties)</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>a proxy instance (see Proxy) to use when connecting</p>
 </div>
-          
         </li>
       
         <li>
@@ -2674,11 +2646,9 @@ Net::SSH::Connection::Session#properties)</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>the max number of blocks to process before rekeying</p>
 </div>
-          
         </li>
       
         <li>
@@ -2687,11 +2657,9 @@ Net::SSH::Connection::Session#properties)</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>the max number of bytes to process before rekeying</p>
 </div>
-          
         </li>
       
         <li>
@@ -2700,11 +2668,9 @@ Net::SSH::Connection::Session#properties)</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>the max number of packets to process before rekeying</p>
 </div>
-          
         </li>
       
         <li>
@@ -2716,11 +2682,9 @@ Net::SSH::Connection::Session#properties)</p>
               <tt>60</tt>
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>maximum idle time before a connection will time out (0 = disable).</p>
 </div>
-          
         </li>
       
         <li>
@@ -2732,12 +2696,10 @@ Net::SSH::Connection::Session#properties)</p>
               <tt>3600</tt>
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>maximum time before aborting an operation (0 = disable). you may use this
 to guard against run-away processes.</p>
 </div>
-          
         </li>
       
         <li>
@@ -2749,12 +2711,10 @@ to guard against run-away processes.</p>
               <tt>60</tt>
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>send keep-alive probes at this interval to prevent connections from timing
 out unexpectedly.</p>
 </div>
-          
         </li>
       
         <li>
@@ -2766,12 +2726,10 @@ out unexpectedly.</p>
               <tt>5</tt>
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>grace-period on close before the connection will be terminated forcefully
 (0 = terminate immediately).</p>
 </div>
-          
         </li>
       
         <li>
@@ -2780,11 +2738,9 @@ out unexpectedly.</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>the username to log in as</p>
 </div>
-          
         </li>
       
         <li>
@@ -2796,12 +2752,10 @@ out unexpectedly.</p>
               <tt>['~/.ssh/known_hosts</tt>, <tt>~/.ssh/known_hosts2']</tt>
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>the location of the user known hosts file. Set to an array to specify
 multiple user known hosts files.</p>
 </div>
-          
         </li>
       
         <li>
@@ -2810,14 +2764,12 @@ multiple user known hosts files.</p>
           <span class="default">
             
           </span>
-          
-            &mdash; <div class='inline'>
+          &mdash; <div class='inline'>
 <p>how verbose to be (Logger verbosity constants, Logger::DEBUG is very
 verbose, Logger::FATAL is all but silent). Logger::FATAL is the default.
 The symbols :debug, :info, :warn, :error, and :fatal are also supported and
 are translated to the corresponding Logger constant.</p>
 </div>
-          
         </li>
       
     </ul>
@@ -2965,9 +2917,9 @@ are translated to the corresponding Logger constant.</p>
 </div>
 
     <div id="footer">
-  Generated on Sat Jan 26 15:45:02 2013 by
+  Generated on Sat Jan 26 16:28:51 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.3 (ruby-1.9.3).
+  0.8.0 (ruby-1.9.3).
 </div>
 
   </body>
