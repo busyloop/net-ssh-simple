@@ -12,8 +12,8 @@ synchronously or asynchronously.
 == Features
 
 * Friendly, flexible API for SSH and SCP (synchronous and asynchronous)
-* All results are returned as {Net::SSH::Simple::Result}[http://rubydoc.info/gems/net-ssh-simple/Net/SSH/Simple/Result]
-* All errors are raised as {Net::SSH::Simple::Error}[http://rubydoc.info/gems/net-ssh-simple/Net/SSH/Simple/Error]
+* All results are returned as {Net::SSH::Simple::Result}[http://busyloop.github.com/net-ssh-simple/doc/Net/SSH/Simple/Result]
+* All errors are raised as {Net::SSH::Simple::Error}[http://busyloop.github.com/net-ssh-simple/doc/Net/SSH/Simple/Error]
 * Efficient by default; re-uses transport connections where possible
 * Maintains Keep-Alive to prevent unexpected connection timeouts
 * Lots of documentation
@@ -25,7 +25,7 @@ synchronously or asynchronously.
 
 == Examples
 
-Note: If you are reading this on github then {click here}[http://rubydoc.info/gems/net-ssh-simple/file/README.rdoc] for a more readable
+Note: If you are reading this on github then {click here}[http://busyloop.github.com/net-ssh-simple/doc/] for a more readable
 version with syntax highlighting.
 
 
@@ -137,7 +137,7 @@ then the following idiom will provide the best performance:
 
 == Documentation
 
-See {Net::SSH::Simple}[http://rubydoc.info/gems/net-ssh-simple/Net/SSH/Simple] for more examples and full API.
+See {Net::SSH::Simple}[http://busyloop.github.com/net-ssh-simple/doc/Net/SSH/Simple] for more examples and full API.
 
 == Running the test suite
 
