@@ -701,7 +701,7 @@ module Net
         # Reference to the underlying Exception
         attr_reader :wrapped
 
-        # {Net::SSH::Simple::Result} of the interrupted operation.
+        # {Net::SSH::Simple::Result} of the interrupted operation (may be incomplete!).
         attr_reader :result
 
         def initialize(msg, e=$!)
@@ -720,7 +720,7 @@ module Net
       #
       # @attr [String] host Hostname/IP address
       # @attr [Symbol] op :ssh or :scp
-      # @attr [String] cmd Shell command (SSH only)
+      # @attr [String] cmd Shell command (ssh) or :upload/:download (scp)
       # @attr [Time] start_at Timestamp of operation start
       # @attr [Time] finish_at Timestamp of operation finish
       # @attr [Time] last_keepalive_at Timestamp of last keepalive (if any)
