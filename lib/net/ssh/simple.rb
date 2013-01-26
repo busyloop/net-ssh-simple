@@ -687,7 +687,13 @@ module Net
           @result
         end
       end
+    end
+  end
+end
 
+module Net
+  module SSH
+    class Simple
       #
       # Error that occured during a Net::SSH::Simple operation.
       #
