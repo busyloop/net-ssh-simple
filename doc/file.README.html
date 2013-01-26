@@ -1,0 +1,258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.8.3
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!" + escape(window.location.href);
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><div id='filecontents'>
+<h1>Net::SSH::Simple <a href="https://gemnasium.com/busyloop/net-ssh-simple"><img src="https://gemnasium.com/busyloop/net-ssh-simple.png" alt="Dependency Status" /></a></h1>
+
+<p>Net::SSH::Simple is a simple wrapper around Net::SSH and Net::SCP.</p>
+
+<p>It reduces the amount of boilerplate code that you need to write for
+handling SSH-connections, thereby preventing many common mistakes related
+to error-handling, threading, timeouts and keep-alive.</p>
+
+<p>It also makes it very easy to talk to many hosts in parallel synchronously
+or asynchronously.</p>
+
+<h2>Features</h2>
+<ul><li>
+<p>Friendly, flexible API for SSH and SCP (synchronous and asynchronous)</p>
+</li><li>
+<p>All results are returned as <a
+href="http://rubydoc.info/gems/net-ssh-simple/Net/SSH/Simple/Result">Net::SSH::Simple::Result</a></p>
+</li><li>
+<p>All errors are raised as <a
+href="http://rubydoc.info/gems/net-ssh-simple/Net/SSH/Simple/Error">Net::SSH::Simple::Error</a></p>
+</li><li>
+<p>Efficient by default; re-uses transport connections where possible</p>
+</li><li>
+<p>Maintains Keep-Alive to prevent unexpected connection timeouts</p>
+</li><li>
+<p>Lots of documentation</p>
+</li><li>
+<p><a href="https://busyloop.net/oss/net-ssh-simple/coverage/">100%</a> test
+coverage</p>
+</li></ul>
+
+<h2>Installation</h2>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_gem'>gem</span> <span class='id identifier rubyid_install'>install</span> <span class='id identifier rubyid_net'>net</span><span class='op'>-</span><span class='id identifier rubyid_ssh'>ssh</span><span class='op'>-</span><span class='id identifier rubyid_simple'>simple</span></code></pre>
+
+<h2>Examples</h2>
+
+<p>Note: If you are reading this on github then <a
+href="http://rubydoc.info/gems/net-ssh-simple/file/README.rdoc">click
+here</a> for a more readable version with syntax highlighting.</p>
+
+<h3>Block Syntax (synchronous)</h3>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>net/ssh/simple</span><span class='tstring_end'>'</span></span>
+
+<span class='const'>Net</span><span class='op'>::</span><span class='const'>SSH</span><span class='op'>::</span><span class='const'>Simple</span><span class='period'>.</span><span class='id identifier rubyid_sync'>sync</span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_r'>r</span> <span class='op'>=</span> <span class='id identifier rubyid_ssh'>ssh</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example1.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>echo &quot;Hello World.&quot;</span><span class='tstring_end'>'</span></span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_stdout'>stdout</span> <span class='comment'>#=&gt; &quot;Hello World.&quot;
+</span>
+  <span class='id identifier rubyid_scp_put'>scp_put</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example2.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/local_foo</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/remote_bar</span><span class='tstring_end'>'</span></span>
+  <span class='id identifier rubyid_scp_get'>scp_get</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example3.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/remote_foo</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/local_bar</span><span class='tstring_end'>'</span></span>
+<span class='kw'>end</span></code></pre>
+
+<h3>Block Syntax (asynchronous)</h3>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>net/ssh/simple</span><span class='tstring_end'>'</span></span>
+
+<span class='id identifier rubyid_t1'>t1</span> <span class='op'>=</span> <span class='const'>Net</span><span class='op'>::</span><span class='const'>SSH</span><span class='op'>::</span><span class='const'>Simple</span><span class='period'>.</span><span class='id identifier rubyid_async'>async</span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_scp_put'>scp_put</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example1.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/local_foo</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/remote_bar</span><span class='tstring_end'>'</span></span>
+  <span class='id identifier rubyid_ssh'>ssh</span>     <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example3.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>echo &quot;Hello World A.&quot;</span><span class='tstring_end'>'</span></span>
+<span class='kw'>end</span>
+<span class='id identifier rubyid_t2'>t2</span> <span class='op'>=</span> <span class='const'>Net</span><span class='op'>::</span><span class='const'>SSH</span><span class='op'>::</span><span class='const'>Simple</span><span class='period'>.</span><span class='id identifier rubyid_async'>async</span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_scp_get'>scp_get</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example6.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/remote_foo</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/local_bar</span><span class='tstring_end'>'</span></span>
+  <span class='id identifier rubyid_ssh'>ssh</span>     <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example7.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>echo &quot;Hello World B.&quot;</span><span class='tstring_end'>'</span></span>
+<span class='kw'>end</span>
+<span class='id identifier rubyid_r1'>r1</span> <span class='op'>=</span> <span class='id identifier rubyid_t1'>t1</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span> <span class='comment'># wait for t1 to finish and grab return value
+</span><span class='id identifier rubyid_r2'>r2</span> <span class='op'>=</span> <span class='id identifier rubyid_t2'>t2</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span> <span class='comment'># wait for t2 to finish and grab return value
+</span>
+<span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_r1'>r1</span><span class='period'>.</span><span class='id identifier rubyid_stdout'>stdout</span> <span class='comment'>#=&gt; &quot;Hello World A.&quot;
+</span><span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_r2'>r2</span><span class='period'>.</span><span class='id identifier rubyid_stdout'>stdout</span> <span class='comment'>#=&gt; &quot;Hello World B.&quot;</span></code></pre>
+
+<h3>Using an instance</h3>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>net/ssh/simple</span><span class='tstring_end'>'</span></span>
+
+<span class='id identifier rubyid_s'>s</span> <span class='op'>=</span> <span class='const'>Net</span><span class='op'>::</span><span class='const'>SSH</span><span class='op'>::</span><span class='const'>Simple</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+<span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_ssh'>ssh</span>     <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example1.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>echo &quot;Hello World.&quot;</span><span class='tstring_end'>'</span></span>
+<span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_scp_put'>scp_put</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example2.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/local_foo</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/remote_bar</span><span class='tstring_end'>'</span></span>
+<span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_scp_get'>scp_get</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example3.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/remote_foo</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/local_bar</span><span class='tstring_end'>'</span></span>
+<span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_close'>close</span></code></pre>
+
+<h2>Thread safety</h2>
+
+<p>Do <em>not</em> share a Net::SSH::Simple instance across threads.</p>
+
+<p>That's the only rule to watch out for. Other than that you're free to use
+Net::SSH::Simple concurrently in different Threads. If you only use the
+block-syntax then you have nothing to worry about.</p>
+
+<p>If you want to use the instance syntax in a threaded environment then the
+following idiom will provide the best performance:</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>net/ssh/simple</span><span class='tstring_end'>'</span></span>
+
+<span class='comment'># Create and re-use one instance per thread, with a default username.
+</span><span class='kw'>def</span> <span class='id identifier rubyid_ss'>ss</span>
+  <span class='const'>Thread</span><span class='period'>.</span><span class='id identifier rubyid_current'>current</span><span class='lbracket'>[</span><span class='symbol'>:simplessh</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='const'>Net</span><span class='op'>::</span><span class='const'>SSH</span><span class='op'>::</span><span class='const'>Simple</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='symbol'>:user</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>bob</span><span class='tstring_end'>'</span></span><span class='rbrace'>}</span><span class='rparen'>)</span>
+<span class='kw'>end</span>
+
+<span class='comment'># Strictly optional. You may use this method to close the
+</span><span class='comment'># SSH connections early. Otherwise our instance will tear
+</span><span class='comment'># down automatically when the enclosing thread finishes.
+</span><span class='kw'>def</span> <span class='id identifier rubyid_ss_close'>ss_close</span>
+  <span class='id identifier rubyid_ss'>ss</span><span class='period'>.</span><span class='id identifier rubyid_close'>close</span>
+  <span class='const'>Thread</span><span class='period'>.</span><span class='id identifier rubyid_current'>current</span><span class='lbracket'>[</span><span class='symbol'>:simplessh</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+<span class='kw'>end</span>
+
+<span class='comment'># By sharing the same Net::SSH::Simple instance across calls
+</span><span class='comment'># to this method our ssh transport connections get re-used
+</span><span class='comment'># when the same remote host is accessed multiple times.
+</span><span class='kw'>def</span> <span class='id identifier rubyid_do_something_involving_ssh'>do_something_involving_ssh</span>
+  <span class='comment'># The connections to example1-5.com are re-used across
+</span>  <span class='comment'># multiple calls to this method.
+</span>  <span class='id identifier rubyid_ss'>ss</span><span class='period'>.</span><span class='id identifier rubyid_ssh'>ssh</span>     <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example1.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>echo &quot;Hello World.&quot;</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='symbol'>:user</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>not_bob</span><span class='tstring_end'>'</span></span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_ss'>ss</span><span class='period'>.</span><span class='id identifier rubyid_scp_put'>scp_put</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example2.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/local_foo</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/remote_bar</span><span class='tstring_end'>'</span></span>
+  <span class='id identifier rubyid_ss'>ss</span><span class='period'>.</span><span class='id identifier rubyid_scp_get'>scp_get</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example3.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/remote_foo</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/local_bar</span><span class='tstring_end'>'</span></span>
+
+  <span class='id identifier rubyid_t'>t</span> <span class='op'>=</span> <span class='id identifier rubyid_ss'>ss</span><span class='period'>.</span><span class='id identifier rubyid_async'>async</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_scp_put'>scp_put</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example4.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/local_foo</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/remote_bar</span><span class='tstring_end'>'</span></span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_ss'>ss</span><span class='period'>.</span><span class='id identifier rubyid_sync'>sync</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_scp_put'>scp_put</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example5.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/local_foo</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/remote_bar</span><span class='tstring_end'>'</span></span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># wait for our async call to finish
+</span>  <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span>
+
+  <span class='comment'># Below we explicitly do _not_ use the shared instance
+</span>  <span class='comment'># because we want these connections to close immediately
+</span>  <span class='comment'># after the block finishes. This is useful when you know
+</span>  <span class='comment'># that some hosts will be connected to only once during
+</span>  <span class='comment'># the lifetime of a thread (there's no point in keeping
+</span>  <span class='comment'># these open).
+</span>  <span class='const'>Net</span><span class='op'>::</span><span class='const'>SSH</span><span class='op'>::</span><span class='const'>Simple</span><span class='period'>.</span><span class='id identifier rubyid_sync'>sync</span> <span class='kw'>do</span>
+    <span class='comment'># opens connections to example8.com, example9.com
+</span>    <span class='id identifier rubyid_ssh'>ssh</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example8.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>echo &quot;Hello World.&quot;</span><span class='tstring_end'>'</span></span>
+    <span class='id identifier rubyid_ssh'>ssh</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example9.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>echo &quot;Hello World.&quot;</span><span class='tstring_end'>'</span></span>
+
+    <span class='comment'># connections are reused
+</span>    <span class='id identifier rubyid_ssh'>ssh</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example8.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>echo &quot;World Hello.&quot;</span><span class='tstring_end'>'</span></span>
+    <span class='id identifier rubyid_ssh'>ssh</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>example9.com</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>echo &quot;World Hello.&quot;</span><span class='tstring_end'>'</span></span>
+
+    <span class='comment'># both connections close at the end of this block
+</span>  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+
+<h2>Documentation</h2>
+
+<p>See <a
+href="http://rubydoc.info/gems/net-ssh-simple/Net/SSH/Simple">Net::SSH::Simple</a>
+for more examples and full API.</p>
+
+<h2>Running the test suite</h2>
+
+<p>The spec-suite makes SSH-connections to localhost, thus you need to have
+your own ssh-key authorized in order to run it. Please see the comment at
+the top of 'spec/net-ssh-simple.rb' on how to set this up.</p>
+
+<p>When your host is properly configured the following command should pass:</p>
+
+<pre class="code ruby"><code>$ bundle exec rake</code></pre>
+
+<h2>License (MIT)</h2>
+
+<p>Copyright (C) 2011 by moe@busyloop.net</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.</p>
+</div></div>
+
+    <div id="footer">
+  Generated on Sat Jan 26 15:45:02 2013 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.3 (ruby-1.9.3).
+</div>
+
+  </body>
+</html>
