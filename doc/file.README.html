@@ -2,11 +2,11 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
 <title>
   File: README
   
-    &mdash; Documentation by YARD 0.8.0
+    &mdash; Documentation by YARD 0.8.3
   
 </title>
 
@@ -62,7 +62,7 @@
     <iframe id="search_frame"></iframe>
 
     <div id="content"><div id='filecontents'>
-<h1>Net::SSH::Simple <a href="https://gemnasium.com/busyloop/net-ssh-simple"><img src="https://gemnasium.com/busyloop/net-ssh-simple.png" alt="Dependency Status" /></a></h1>
+<h1>Net::SSH::Simple</h1>
 
 <p>Net::SSH::Simple is a simple wrapper around Net::SSH and Net::SCP.</p>
 
@@ -78,10 +78,10 @@ or asynchronously.</p>
 <p>Friendly, flexible API for SSH and SCP (synchronous and asynchronous)</p>
 </li><li>
 <p>All results are returned as <a
-href="http://rubydoc.info/gems/net-ssh-simple/Net/SSH/Simple/Result">Net::SSH::Simple::Result</a></p>
+href="http://busyloop.github.com/net-ssh-simple/doc/Net/SSH/Simple/Result">Net::SSH::Simple::Result</a></p>
 </li><li>
 <p>All errors are raised as <a
-href="http://rubydoc.info/gems/net-ssh-simple/Net/SSH/Simple/Error">Net::SSH::Simple::Error</a></p>
+href="http://busyloop.github.com/net-ssh-simple/doc/Net/SSH/Simple/Error">Net::SSH::Simple::Error</a></p>
 </li><li>
 <p>Efficient by default; re-uses transport connections where possible</p>
 </li><li>
@@ -89,7 +89,7 @@ href="http://rubydoc.info/gems/net-ssh-simple/Net/SSH/Simple/Error">Net::SSH::Si
 </li><li>
 <p>Lots of documentation</p>
 </li><li>
-<p><a href="https://busyloop.net/oss/net-ssh-simple/coverage/">100%</a> test
+<p><a href="http://busyloop.github.com/net-ssh-simple/coverage/">100%</a> test
 coverage</p>
 </li></ul>
 
@@ -100,8 +100,8 @@ coverage</p>
 <h2>Examples</h2>
 
 <p>Note: If you are reading this on github then <a
-href="http://rubydoc.info/gems/net-ssh-simple/file/README.rdoc">click
-here</a> for a more readable version with syntax highlighting.</p>
+href="http://busyloop.github.com/net-ssh-simple/doc/">click here</a> for a
+more readable version with syntax highlighting.</p>
 
 <h3>Block Syntax (synchronous)</h3>
 
@@ -147,7 +147,7 @@ here</a> for a more readable version with syntax highlighting.</p>
 
 <p>Do <em>not</em> share a Net::SSH::Simple instance across threads.</p>
 
-<p>That’s the only rule to watch out for. Other than that you’re free to use
+<p>That's the only rule to watch out for. Other than that you're free to use
 Net::SSH::Simple concurrently in different Threads. If you only use the
 block-syntax then you have nothing to worry about.</p>
 
@@ -212,14 +212,14 @@ following idiom will provide the best performance:</p>
 <h2>Documentation</h2>
 
 <p>See <a
-href="http://rubydoc.info/gems/net-ssh-simple/Net/SSH/Simple">Net::SSH::Simple</a>
+href="http://busyloop.github.com/net-ssh-simple/doc/Net/SSH/Simple">Net::SSH::Simple</a>
 for more examples and full API.</p>
 
 <h2>Running the test suite</h2>
 
 <p>The spec-suite makes SSH-connections to localhost, thus you need to have
 your own ssh-key authorized in order to run it. Please see the comment at
-the top of ‘spec/net-ssh-simple.rb’ on how to set this up.</p>
+the top of 'spec/net-ssh-simple.rb' on how to set this up.</p>
 
 <p>When your host is properly configured the following command should pass:</p>
 
@@ -230,7 +230,7 @@ the top of ‘spec/net-ssh-simple.rb’ on how to set this up.</p>
 <p>Copyright (C) 2011 by moe@busyloop.net</p>
 
 <p>Permission is hereby granted, free of charge, to any person obtaining a
-copy of this software and associated documentation files (the “Software”),
+copy of this software and associated documentation files (the "Software"),
 to deal in the Software without restriction, including without limitation
 the rights to use, copy, modify, merge, publish, distribute, sublicense,
 and/or sell copies of the Software, and to permit persons to whom the
@@ -239,7 +239,7 @@ Software is furnished to do so, subject to the following conditions:</p>
 <p>The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.</p>
 
-<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -249,9 +249,9 @@ DEALINGS IN THE SOFTWARE.</p>
 </div></div>
 
     <div id="footer">
-  Generated on Sat Jan 26 16:28:50 2013 by
+  Generated on Sat Jan 26 17:16:23 2013 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.0 (ruby-1.9.3).
+  0.8.3 (ruby-1.9.3).
 </div>
 
   </body>
