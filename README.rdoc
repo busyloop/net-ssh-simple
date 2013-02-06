@@ -6,8 +6,8 @@ It reduces the amount of boilerplate code that you need to write for
 handling SSH-connections, thereby preventing many common mistakes related
 to error-handling, threading, timeouts and keep-alive.
 
-It also makes it very easy to talk to many hosts in parallel
-synchronously or asynchronously.
+It also simplifies advanced usage such as talking to many hosts
+in parallel or performing streaming operations (stdio).
 
 == Features
 
@@ -137,7 +137,7 @@ then the following idiom will provide the best performance:
 
 == Documentation
 
-See {Net::SSH::Simple}[http://busyloop.github.com/net-ssh-simple/doc/Net/SSH/Simple] for more examples and full API.
+See {Net::SSH::Simple}[http://busyloop.github.com/net-ssh-simple/doc/Net/SSH/Simple.html] for more examples and full API.
 
 == Running the test suite
 
