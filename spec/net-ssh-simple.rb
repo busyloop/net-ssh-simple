@@ -87,44 +87,10 @@ describe Net::SSH::Simple do
       raised.should == true
     end
 
-    it "enforces operation timeout on scp_ul [DEPRECATED]" do
-      raised = false
-      begin
-        r = Net::SSH::Simple.scp_ul('localhost', '/tmp/ssh_test_in0',
-                                    '/tmp/ssh_test_out0', {:operation_timeout=>1}) \
-        do |sent,total|
-          sleep 5
-        end
-      rescue => e
-        raised = true
-        e.to_s.should match /^execution expired @ .*/
-        e.result.op == :ssh
-        e.result.timed_out.should == true
-      end
-      raised.should == true
-    end
-
     it "enforces operation timeout on scp_get" do
       raised = false
       begin
         r = Net::SSH::Simple.scp_get('localhost', '/tmp/ssh_test_in0',
-                                    '/tmp/ssh_test_out0', {:operation_timeout=>1}) \
-        do |sent,total|
-          sleep 5
-        end
-      rescue => e
-        raised = true
-        e.to_s.should match /^execution expired @ .*/
-        e.result.op == :ssh
-        e.result.timed_out.should == true
-      end
-      raised.should == true
-    end
-
-    it "enforces operation timeout on scp_dl [DEPRECATED]" do
-      raised = false
-      begin
-        r = Net::SSH::Simple.scp_dl('localhost', '/tmp/ssh_test_in0',
                                     '/tmp/ssh_test_out0', {:operation_timeout=>1}) \
         do |sent,total|
           sleep 5
@@ -197,16 +163,6 @@ describe Net::SSH::Simple do
       Digest::MD5.file('/tmp/ssh_test_in0').should == Digest::MD5.file('/tmp/ssh_test_out0')
     end
 
-    it "uploads via scp_ul [DEPRECATED]" do
-      mockback = mock(:progress_callback)
-      mockback.should_receive(:ping).at_least(:once)
-      r = Net::SSH::Simple.scp_ul('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0') do |sent,total|
-        mockback.ping
-      end
-      r.success.should == true
-      Digest::MD5.file('/tmp/ssh_test_in0').should == Digest::MD5.file('/tmp/ssh_test_out0')
-    end
-
     it "downloads via scp_get" do
       mockback = mock(:progress_callback)
       mockback.should_receive(:ping).at_least(:once)
@@ -217,15 +173,6 @@ describe Net::SSH::Simple do
       Digest::MD5.file('/tmp/ssh_test_in0').should == Digest::MD5.file('/tmp/ssh_test_out0')
     end
 
-    it "downloads via scp_dl [DEPRECATED]" do
-      mockback = mock(:progress_callback)
-      mockback.should_receive(:ping).at_least(:once)
-      r = Net::SSH::Simple.scp_dl('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0') do |sent,total|
-        mockback.ping
-      end
-      r.success.should == true
-      Digest::MD5.file('/tmp/ssh_test_in0').should == Digest::MD5.file('/tmp/ssh_test_out0')
-    end
   end
 
   describe "instance" do
@@ -281,32 +228,10 @@ describe Net::SSH::Simple do
       Digest::MD5.file('/tmp/ssh_test_in0').should == Digest::MD5.file('/tmp/ssh_test_out0')
     end
 
-    it "uploads via scp_ul [DEPRECATED]" do
-      mockback = mock(:progress_callback)
-      mockback.should_receive(:ping).at_least(:once)
-      r = @s.scp_ul('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0') do |sent,total|
-        mockback.ping
-      end
-      r.success.should == true
-      r.op.should == :scp
-      Digest::MD5.file('/tmp/ssh_test_in0').should == Digest::MD5.file('/tmp/ssh_test_out0')
-    end
-
     it "downloads via scp_get" do
       mockback = mock(:progress_callback)
       mockback.should_receive(:ping).at_least(:once)
       r = @s.scp_get('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0') do |sent,total|
-        mockback.ping
-      end
-      r.success.should == true
-      r.op.should == :scp
-      Digest::MD5.file('/tmp/ssh_test_in0').should == Digest::MD5.file('/tmp/ssh_test_out0')
-    end
-
-    it "downloads via scp_dl [DEPRECATED]" do
-      mockback = mock(:progress_callback)
-      mockback.should_receive(:ping).at_least(:once)
-      r = @s.scp_dl('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0') do |sent,total|
         mockback.ping
       end
       r.success.should == true
@@ -376,18 +301,6 @@ describe Net::SSH::Simple do
       end
     end
 
-    it "uploads via scp_ul [DEPRECATED]" do
-      Net::SSH::Simple.sync do
-        mockback = mock(:progress_callback)
-        mockback.should_receive(:ping).at_least(:once)
-        r = scp_ul('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0') do |sent,total|
-          mockback.ping
-        end
-        r.success.should == true
-        Digest::MD5.file('/tmp/ssh_test_in0').should == Digest::MD5.file('/tmp/ssh_test_out0')
-      end
-    end
-
     it "downloads via scp_get" do
       Net::SSH::Simple.sync do
         mockback = mock(:progress_callback)
@@ -400,17 +313,6 @@ describe Net::SSH::Simple do
       end
     end
 
-    it "downloads via scp_dl [DEPRECATED]" do
-      Net::SSH::Simple.sync do
-        mockback = mock(:progress_callback)
-        mockback.should_receive(:ping).at_least(:once)
-        r = scp_dl('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0') do |sent,total|
-          mockback.ping
-        end
-        r.success.should == true
-        Digest::MD5.file('/tmp/ssh_test_in0').should == Digest::MD5.file('/tmp/ssh_test_out0')
-      end
-    end
   end
 
   describe "asynchronous block syntax" do
@@ -539,20 +441,6 @@ describe Net::SSH::Simple do
       r.opts[:timeout].should == 7
       r.opts[:rekey_packet_limit].should == 42
 
-      # also test deprecated scp_dl and scp_ul
-      r = s.scp_dl('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0',
-                     {:rekey_packet_limit => 42})
-      r.op.should == :scp
-      r.opts[:timeout].should == 7
-      r.opts[:rekey_packet_limit].should == 42
-
-      r = s.scp_ul('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0',
-                     {:rekey_packet_limit => 42})
-      r.op.should == :scp
-      r.opts[:timeout].should == 7
-      r.opts[:rekey_packet_limit].should == 42
-      # /deprecated
-
       s.close
     end
 
@@ -576,20 +464,6 @@ describe Net::SSH::Simple do
         r.opts[:rekey_packet_limit].should == 42
         r.opts[:operation_timeout].should == 11
 
-        # also test deprecated scp_dl and scp_ul
-        r = scp_ul('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0',
-                   {:rekey_packet_limit => 42})
-        r.opts[:timeout].should == 7
-        r.opts[:rekey_packet_limit].should == 42
-        r.opts[:operation_timeout].should == 11
-
-        r = scp_dl('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0',
-                   {:rekey_packet_limit => 42})
-        r.opts[:timeout].should == 7
-        r.opts[:rekey_packet_limit].should == 42
-        r.opts[:operation_timeout].should == 11
-        # /deprecated methods
-
         :happy
       end
       t.value.should == :happy
@@ -611,17 +485,6 @@ describe Net::SSH::Simple do
         r.opts[:timeout].should == 7
         r.opts[:rekey_packet_limit].should == 42
 
-        # also test deprecated scp_dl and scp_ul
-        r = scp_ul('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0',
-                   {:rekey_packet_limit => 42})
-        r.opts[:timeout].should == 7
-        r.opts[:rekey_packet_limit].should == 42
-
-        r = scp_dl('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0',
-                   {:rekey_packet_limit => 42})
-        r.opts[:timeout].should == 7
-        r.opts[:rekey_packet_limit].should == 42
-        # /deprecated methods
       end
     end
 
@@ -640,18 +503,6 @@ describe Net::SSH::Simple do
                    {:rekey_packet_limit => 42})
         r.opts[:timeout].should == 7
         r.opts[:rekey_packet_limit].should == 42
-
-        # also test deprecated scp_dl and scp_ul
-        r = scp_ul('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0',
-                   {:rekey_packet_limit => 42})
-        r.opts[:timeout].should == 7
-        r.opts[:rekey_packet_limit].should == 42
-
-        r = scp_dl('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0',
-                   {:rekey_packet_limit => 42})
-        r.opts[:timeout].should == 7
-        r.opts[:rekey_packet_limit].should == 42
-        # /deprecated methods
 
         :happy
       end

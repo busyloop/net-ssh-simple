@@ -321,18 +321,6 @@ module Net
         r
       end
 
-      # @deprecated Use scp_put instead.
-      def self.scp_ul(*args, &block)
-        warn "[DEPRECATION] Net::SSH::Simple.scp_ul is deprecated. Please use .scp_put instead (usage is identical, the method was only renamed)."
-        self.scp_put(*args, &block)
-      end
-
-      # @deprecated Use scp_get instead.
-      def self.scp_dl(*args, &block)
-        warn "[DEPRECATION] Net::SSH::Simple.scp_dl is deprecated. Please use .scp_get instead (usage is identical, the method was only renamed)."
-        self.scp_get(*args, &block)
-      end
-
       # 
       # SCP upload to a remote host.
       # The underlying Net::SSH::Simple instance will re-use
@@ -366,18 +354,6 @@ module Net
       def scp_get(host, src, dst, opts={}, &block)
         opts = @opts.merge(opts)
         scp(:download, host, src, dst, opts, &block)
-      end
-
-      # @deprecated Use scp_put instead.
-      def scp_ul(host, src, dst, opts={}, &block)
-        warn "[DEPRECATION] Net::SSH::Simple#scp_ul is deprecated. Please use #scp_put instead (usage is identical, the method was only renamed)."
-        scp_put(host, src, dst, opts, &block)
-      end
-
-      # @deprecated Use scp_get instead.
-      def scp_dl(host, src, dst, opts={}, &block)
-        warn "[DEPRECATION] Net::SSH::Simple#scp_dl is deprecated. Please use #scp_get instead (usage is identical, the method was only renamed)."
-        scp_get(host, src, dst, opts, &block)
       end
 
       #
