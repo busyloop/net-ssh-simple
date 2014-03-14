@@ -321,7 +321,7 @@ module Net
         r
       end
 
-      # 
+      #
       # SCP upload to a remote host.
       # The underlying Net::SSH::Simple instance will re-use
       # existing connections for optimal performance.
@@ -342,7 +342,7 @@ module Net
       # SCP download from a remote host.
       # The underlying Net::SSH::Simple instance will re-use
       # existing connections for optimal performance.
-      # 
+      #
       # @param [String] host Destination hostname or ip-address
       # @param [String] src Source path (on remote host)
       # @param [String] dst Destination path (on localhost)
@@ -388,7 +388,7 @@ module Net
       # @option opts [boolean] :forward_agent
       #  set to true if you want the SSH agent connection to be forwarded
       #
-      # @option opts [String/Array] :global_known_hosts_file 
+      # @option opts [String/Array] :global_known_hosts_file
       #  (['/etc/ssh/known_hosts','/etc/ssh/known_hosts2'])
       #  the location of the global known hosts file.
       #  Set to an array if you want to specify multiple
@@ -483,7 +483,7 @@ module Net
       #  :debug, :info, :warn, :error, and :fatal are also supported and are translated
       #  to the corresponding Logger constant.
       #
-      # @see http://net-ssh.github.com/ssh/v2/api/classes/Net/SSH.html#M000002 
+      # @see http://net-ssh.github.com/ssh/v2/api/classes/Net/SSH.html#M000002
       #      Net::SSH documentation for the 'opts'-hash
       def ssh(host, cmd, opts={}, &block)
         opts = @opts.merge(opts)
@@ -491,7 +491,7 @@ module Net
           @result = Result.new(
             { :op => :ssh, :host => host, :cmd => cmd, :start_at => Time.new,
               :last_event_at => Time.new, :opts => opts, :stdout => '', :stderr => '',
-              :success => nil 
+              :success => nil
             } )
 
           channel = session.open_channel do |chan|
@@ -543,8 +543,8 @@ module Net
 
       #
       # Spawn a Thread to perform a sequence of ssh/scp operations.
-      # 
-      # @param [Block] block 
+      #
+      # @param [Block] block
       # @param opts (see Net::SSH::Simple#ssh)
       # @return [Thread] Thread executing the SSH-Block.
       #
@@ -583,7 +583,7 @@ module Net
       # Close and cleanup.
       #
       # @return [Net::SSH::Simple::Result] Result
-      # 
+      #
       def close
         Thread.current[:ssh_simple_sessions].values.each do |session|
           begin
@@ -598,15 +598,21 @@ module Net
         @result
       end
 
+      # set lower default timeout on 32bit ruby
+      MAX_TIMEOUT = ([''].pack('p').size == 8) ? 2**32 : 2**16
+      if MAX_TIMEOUT == 2**16 and $SUPPRESS_32BIT_WARNING.nil?
+        warn "WARNING: 32bit platform detected; Net::SSH::Simple timeout defaults to 65536s (~18 hours)."
+        warn "To suppress this warning set $SUPPRESS_32BIT_WARNING=1 before you require 'net/ssh/simple'."
+      end
 
       private
       EXTRA_OPTS = [:operation_timeout, :close_timeout, :keepalive_interval, :scp_src, :scp_dst]
 
       def with_session(host, opts={}, &block)
         opts[:timeout] ||= 60
-        opts[:timeout] = 2**32 if opts[:timeout] == 0
+        opts[:timeout] = MAX_TIMEOUT if opts[:timeout] == 0
         opts[:operation_timeout] ||= 3600
-        opts[:operation_timeout] = 2**32 if opts[:operation_timeout] == 0
+        opts[:operation_timeout] = MAX_TIMEOUT if opts[:operation_timeout] == 0
         opts[:close_timeout] ||= 5
         opts[:keepalive_interval] ||= 60
         begin
