@@ -1,4 +1,4 @@
-= Net::SSH::Simple
+= Net::SSH::Simple {<img src="https://gemnasium.com/busyloop/net-ssh-simple.png" alt="Dependency Status" />}[https://gemnasium.com/busyloop/net-ssh-simple]
 
 Net::SSH::Simple is a simple wrapper around Net::SSH and Net::SCP.
 
