@@ -154,7 +154,7 @@ describe Net::SSH::Simple do
     end
 
     it "uploads via scp_put" do
-      mockback = mock(:progress_callback)
+      mockback = double(:progress_callback)
       mockback.should_receive(:ping).at_least(:once)
       r = Net::SSH::Simple.scp_put('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0') do |sent,total|
         mockback.ping
@@ -164,7 +164,7 @@ describe Net::SSH::Simple do
     end
 
     it "downloads via scp_get" do
-      mockback = mock(:progress_callback)
+      mockback = double(:progress_callback)
       mockback.should_receive(:ping).at_least(:once)
       r = Net::SSH::Simple.scp_get('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0') do |sent,total|
         mockback.ping
@@ -218,7 +218,7 @@ describe Net::SSH::Simple do
     end
 
     it "uploads via scp_put" do
-      mockback = mock(:progress_callback)
+      mockback = double(:progress_callback)
       mockback.should_receive(:ping).at_least(:once)
       r = @s.scp_put('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0') do |sent,total|
         mockback.ping
@@ -229,7 +229,7 @@ describe Net::SSH::Simple do
     end
 
     it "downloads via scp_get" do
-      mockback = mock(:progress_callback)
+      mockback = double(:progress_callback)
       mockback.should_receive(:ping).at_least(:once)
       r = @s.scp_get('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0') do |sent,total|
         mockback.ping
@@ -291,7 +291,7 @@ describe Net::SSH::Simple do
 
     it "uploads via scp_put" do
       Net::SSH::Simple.sync do
-        mockback = mock(:progress_callback)
+        mockback = double(:progress_callback)
         mockback.should_receive(:ping).at_least(:once)
         r = scp_put('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0') do |sent,total|
           mockback.ping
@@ -303,7 +303,7 @@ describe Net::SSH::Simple do
 
     it "downloads via scp_get" do
       Net::SSH::Simple.sync do
-        mockback = mock(:progress_callback)
+        mockback = double(:progress_callback)
         mockback.should_receive(:ping).at_least(:once)
         r = scp_get('localhost', '/tmp/ssh_test_in0', '/tmp/ssh_test_out0') do |sent,total|
           mockback.ping
@@ -334,12 +334,12 @@ describe Net::SSH::Simple do
       t = []
       (0..CONCURRENCY).each do |i|
         t[i] = Net::SSH::Simple.async do
-          mockback = mock(:progress_callback)
+          mockback = double(:progress_callback)
           mockback.should_receive(:ping).at_least(:once)
           mockback.should_not_receive(:exception)
           begin
             r = nil
-            if 0 == i % 2 
+            if 0 == i % 2
               r = scp_get('localhost', "/tmp/ssh_test_in#{i}", "/tmp/ssh_test_out#{i}") do |sent,total|
                 mockback.ping
               end
@@ -372,10 +372,10 @@ describe Net::SSH::Simple do
         (0..BENCHMARK_CONCURRENCY).each do |i|
           #t[i] = Net::SSH::Simple.async(:verbose=>Logger::DEBUG) do
           t[i] = Net::SSH::Simple.async do
-            mockback = mock(:progress_callback)
+            mockback = double(:progress_callback)
             mockback.should_receive(:ping).at_least(:once)
             r = nil
-            if 0 == i % 2 
+            if 0 == i % 2
               r = scp_get('localhost', "/tmp/ssh_test_in#{i}", "/tmp/ssh_test_out#{i}") do |sent,total|
                 mockback.ping
               end
@@ -512,7 +512,7 @@ describe Net::SSH::Simple do
 
   describe "event api" do
     it "works with singleton syntax" do
-      mockie = mock(:callbacks)
+      mockie = double(:callbacks)
       mockie.should_receive(:start).once.ordered
       mockie.should_receive(:finish).once.ordered
       r = Net::SSH::Simple.ssh('localhost', '/bin/sh') do |e,c,d|
@@ -530,7 +530,7 @@ describe Net::SSH::Simple do
     end
 
     it "works with instance syntax" do
-      mockie = mock(:callbacks)
+      mockie = double(:callbacks)
       mockie.should_receive(:start).once.ordered
       mockie.should_receive(:finish).once.ordered
       s =  Net::SSH::Simple.new
@@ -549,7 +549,7 @@ describe Net::SSH::Simple do
     end
 
     it "works with synchronous block syntax" do
-      mockie = mock(:callbacks)
+      mockie = double(:callbacks)
       mockie.should_receive(:start).once.ordered
       mockie.should_receive(:finish).once.ordered
       r = Net::SSH::Simple.sync do
@@ -570,7 +570,7 @@ describe Net::SSH::Simple do
 
     it "works with asynchronous block syntax" do
       t = Net::SSH::Simple.async do
-        mockie = mock(:callbacks)
+        mockie = double(:callbacks)
         mockie.should_receive(:start).once.ordered
         mockie.should_receive(:finish).once.ordered
         ssh('localhost', '/bin/sh') do |e,c,d|
@@ -590,7 +590,7 @@ describe Net::SSH::Simple do
     end
 
     it "handles long stdin->stdout pipe" do
-      mockie = mock(:callbacks)
+      mockie = double(:callbacks)
       mockie.should_receive(:start).once.ordered
       mockie.should_receive(:exit_code).once.ordered
       mockie.should_receive(:finish).once.ordered
@@ -628,7 +628,7 @@ describe Net::SSH::Simple do
     end
 
     it "handles intermingled stdout/stderr" do
-      mockie = mock(:callbacks)
+      mockie = double(:callbacks)
       mockie.should_receive(:start).once.ordered
       mockie.should_receive(:exit_code).once.ordered
       mockie.should_receive(:finish).once.ordered
@@ -695,7 +695,7 @@ describe Net::SSH::Simple do
     end
 
     it "handles signals" do
-      mockie = mock(:callbacks)
+      mockie = double(:callbacks)
       mockie.should_receive(:start).once.ordered
       mockie.should_not_receive(:exit_code)
       mockie.should_receive(:exit_signal).once
@@ -734,7 +734,7 @@ describe Net::SSH::Simple do
     end
 
     it "handles signals (:no_raise)" do
-      mockie = mock(:callbacks)
+      mockie = double(:callbacks)
       mockie.should_receive(:start).once.ordered
       mockie.should_not_receive(:exit_code)
       mockie.should_receive(:exit_signal).once

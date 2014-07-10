@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.add_dependency "hashie", ">= 1.1.0"
 
   s.add_development_dependency "rake", "~> 10.0.3"
-  s.add_development_dependency "rspec"
+  s.add_development_dependency "rspec", "= 2.14.1"
   s.add_development_dependency "simplecov"
   s.add_development_dependency "yard", "~> 0.8.2"
 
