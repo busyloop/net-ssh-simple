@@ -17,7 +17,7 @@ in parallel or performing streaming operations (stdio).
 * Efficient by default; re-uses transport connections where possible
 * Maintains Keep-Alive to prevent unexpected connection timeouts
 * Lots of documentation
-* {100%}[http://busyloop.github.com/net-ssh-simple/coverage/] test coverage
+* {98.8%}[http://busyloop.github.com/net-ssh-simple/coverage/] test coverage
 
 == Installation
 
