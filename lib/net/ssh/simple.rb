@@ -587,7 +587,7 @@ module Net
       def close
         Thread.current[:ssh_simple_sessions].values.each do |session|
           begin
-            Timeout.timeout(@opts[:close_timeout] || 5) { session.close }
+            ::Timeout.timeout(@opts[:close_timeout] || 5) { session.close }
           rescue => e
             begin
               session.shutdown!
@@ -617,7 +617,7 @@ module Net
         opts[:keepalive_interval] ||= 60
         begin
           net_ssh_opts = opts.reject{|k,v| EXTRA_OPTS.include? k }
-          Timeout.timeout(opts[:operation_timeout]) do
+          ::Timeout.timeout(opts[:operation_timeout]) do
             session = Thread.current[:ssh_simple_sessions][host.hash] \
                     = Thread.current[:ssh_simple_sessions][host.hash] \
                    || Net::SSH.start(*[host, opts[:user], net_ssh_opts])
@@ -627,7 +627,7 @@ module Net
           opts[:password].gsub!(/./,'*') if opts.include? :password
           @result[:exception] = e
           @result[:success] = false
-          @result[:timed_out] = true if e.is_a? Timeout::Error
+          @result[:timed_out] = true if e.is_a? ::Timeout::Error
           @result[:finish_at] = Time.new
           raise Net::SSH::Simple::Error, [e, @result]
         end
@@ -636,7 +636,7 @@ module Net
       def wait_for_channel(session, channel, result, opts)
         session.loop(1) do
           if opts[:timeout] < Time.now - result[:last_event_at]
-            raise Timeout::Error, 'idle timeout'
+            raise ::Timeout::Error, 'idle timeout'
           end
 
           # Send keep-alive probes at the configured interval.
