@@ -6,3 +6,4 @@ pkg/*
 .yardoc
 coverage.data
 sync
+*.json.lock
