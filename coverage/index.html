@@ -14,7 +14,7 @@
       <img src="./assets/0.8.0/loading.gif" alt="loading"/>
     </div>
     <div id="wrapper" style="display:none;">
-      <div class="timestamp">Generated <abbr class="timeago" title="2015-10-29T13:18:16+01:00">2015-10-29T13:18:16+01:00</abbr></div>
+      <div class="timestamp">Generated <abbr class="timeago" title="2016-01-04T09:09:49+01:00">2016-01-04T09:09:49+01:00</abbr></div>
       <ul class="group_tabs"></ul>
 
       <div id="content">
@@ -25,7 +25,7 @@
      covered at
      <span class="covered_strength">
        <span class="green">
-         70.2
+         71.7
        </span>
     </span> hits/line)
   </h2>
@@ -57,7 +57,7 @@
         <td>166</td>
         <td>164</td>
         <td>2</td>
-        <td>70.2</td>
+        <td>71.7</td>
       </tr>
       
     </tbody>
@@ -3018,20 +3018,20 @@
           <code class="ruby">      def ssh(host, cmd, opts={}, &amp;block)</code>
         </li>
       
-        <li class="covered" data-hits="68" data-linenumber="489">
-          <span class="hits">68</span>
+        <li class="covered" data-hits="69" data-linenumber="489">
+          <span class="hits">69</span>
           
           <code class="ruby">        opts = @opts.merge(opts)</code>
         </li>
       
-        <li class="covered" data-hits="68" data-linenumber="490">
-          <span class="hits">68</span>
+        <li class="covered" data-hits="69" data-linenumber="490">
+          <span class="hits">69</span>
           
           <code class="ruby">        with_session(host, opts) do |session|</code>
         </li>
       
-        <li class="covered" data-hits="67" data-linenumber="491">
-          <span class="hits">67</span>
+        <li class="covered" data-hits="68" data-linenumber="491">
+          <span class="hits">68</span>
           
           <code class="ruby">          @result = Result.new(</code>
         </li>
@@ -3066,44 +3066,44 @@
           <code class="ruby"></code>
         </li>
       
-        <li class="covered" data-hits="67" data-linenumber="497">
-          <span class="hits">67</span>
+        <li class="covered" data-hits="68" data-linenumber="497">
+          <span class="hits">68</span>
           
           <code class="ruby">          channel = session.open_channel do |chan|</code>
         </li>
       
-        <li class="covered" data-hits="67" data-linenumber="498">
-          <span class="hits">67</span>
+        <li class="covered" data-hits="68" data-linenumber="498">
+          <span class="hits">68</span>
           
           <code class="ruby">            chan.exec cmd do |ch, success|</code>
         </li>
       
-        <li class="covered" data-hits="67" data-linenumber="499">
-          <span class="hits">67</span>
+        <li class="covered" data-hits="68" data-linenumber="499">
+          <span class="hits">68</span>
           
           <code class="ruby">              @result[:success] = success</code>
         </li>
       
-        <li class="covered" data-hits="67" data-linenumber="500">
-          <span class="hits">67</span>
+        <li class="covered" data-hits="68" data-linenumber="500">
+          <span class="hits">68</span>
           
           <code class="ruby">              ch.on_data do |c, data|</code>
         </li>
       
-        <li class="covered" data-hits="242" data-linenumber="501">
-          <span class="hits">242</span>
+        <li class="covered" data-hits="269" data-linenumber="501">
+          <span class="hits">269</span>
           
           <code class="ruby">                @result[:last_event_at] = Time.new</code>
         </li>
       
-        <li class="covered" data-hits="242" data-linenumber="502">
-          <span class="hits">242</span>
+        <li class="covered" data-hits="269" data-linenumber="502">
+          <span class="hits">269</span>
           
           <code class="ruby">                r = block.call(:stdout, ch, data) if block</code>
         </li>
       
-        <li class="covered" data-hits="242" data-linenumber="503">
-          <span class="hits">242</span>
+        <li class="covered" data-hits="269" data-linenumber="503">
+          <span class="hits">269</span>
           
           <code class="ruby">                @result[:stdout] += data.to_s unless r == :no_append</code>
         </li>
@@ -3114,26 +3114,26 @@
           <code class="ruby">              end</code>
         </li>
       
-        <li class="covered" data-hits="67" data-linenumber="505">
-          <span class="hits">67</span>
+        <li class="covered" data-hits="68" data-linenumber="505">
+          <span class="hits">68</span>
           
           <code class="ruby">              ch.on_extended_data do |c, type, data|</code>
         </li>
       
-        <li class="covered" data-hits="206" data-linenumber="506">
-          <span class="hits">206</span>
+        <li class="covered" data-hits="229" data-linenumber="506">
+          <span class="hits">229</span>
           
           <code class="ruby">                @result[:last_event_at] = Time.new</code>
         </li>
       
-        <li class="covered" data-hits="206" data-linenumber="507">
-          <span class="hits">206</span>
+        <li class="covered" data-hits="229" data-linenumber="507">
+          <span class="hits">229</span>
           
           <code class="ruby">                r = block.call(:stderr, ch, data) if block</code>
         </li>
       
-        <li class="covered" data-hits="206" data-linenumber="508">
-          <span class="hits">206</span>
+        <li class="covered" data-hits="229" data-linenumber="508">
+          <span class="hits">229</span>
           
           <code class="ruby">                @result[:stderr] += data.to_s unless r == :no_append</code>
         </li>
@@ -3144,32 +3144,32 @@
           <code class="ruby">              end</code>
         </li>
       
-        <li class="covered" data-hits="67" data-linenumber="510">
-          <span class="hits">67</span>
+        <li class="covered" data-hits="68" data-linenumber="510">
+          <span class="hits">68</span>
           
           <code class="ruby">              ch.on_request(&#39;exit-status&#39;) do |c, data|</code>
         </li>
       
-        <li class="covered" data-hits="62" data-linenumber="511">
-          <span class="hits">62</span>
+        <li class="covered" data-hits="63" data-linenumber="511">
+          <span class="hits">63</span>
           
           <code class="ruby">                @result[:last_event_at] = Time.new</code>
         </li>
       
-        <li class="covered" data-hits="62" data-linenumber="512">
-          <span class="hits">62</span>
+        <li class="covered" data-hits="63" data-linenumber="512">
+          <span class="hits">63</span>
           
           <code class="ruby">                exit_code = data.read_long</code>
         </li>
       
-        <li class="covered" data-hits="62" data-linenumber="513">
-          <span class="hits">62</span>
+        <li class="covered" data-hits="63" data-linenumber="513">
+          <span class="hits">63</span>
           
           <code class="ruby">                block.call(:exit_code, ch, exit_code) if block</code>
         </li>
       
-        <li class="covered" data-hits="62" data-linenumber="514">
-          <span class="hits">62</span>
+        <li class="covered" data-hits="63" data-linenumber="514">
+          <span class="hits">63</span>
           
           <code class="ruby">                @result[:exit_code] = exit_code</code>
         </li>
@@ -3180,8 +3180,8 @@
           <code class="ruby">              end</code>
         </li>
       
-        <li class="covered" data-hits="67" data-linenumber="516">
-          <span class="hits">67</span>
+        <li class="covered" data-hits="68" data-linenumber="516">
+          <span class="hits">68</span>
           
           <code class="ruby">              ch.on_request(&#39;exit-signal&#39;) do |c, data|</code>
         </li>
@@ -3240,8 +3240,8 @@
           <code class="ruby">              end</code>
         </li>
       
-        <li class="covered" data-hits="67" data-linenumber="526">
-          <span class="hits">67</span>
+        <li class="covered" data-hits="68" data-linenumber="526">
+          <span class="hits">68</span>
           
           <code class="ruby">              block.call(:start, ch, nil) if block</code>
         </li>
@@ -3258,26 +3258,26 @@
           <code class="ruby">          end</code>
         </li>
       
-        <li class="covered" data-hits="67" data-linenumber="529">
-          <span class="hits">67</span>
+        <li class="covered" data-hits="68" data-linenumber="529">
+          <span class="hits">68</span>
           
           <code class="ruby">          wait_for_channel session, channel, @result, opts</code>
         </li>
       
-        <li class="covered" data-hits="63" data-linenumber="530">
-          <span class="hits">63</span>
+        <li class="covered" data-hits="64" data-linenumber="530">
+          <span class="hits">64</span>
           
           <code class="ruby">          @result[:finish_at] = Time.new</code>
         </li>
       
-        <li class="covered" data-hits="63" data-linenumber="531">
-          <span class="hits">63</span>
+        <li class="covered" data-hits="64" data-linenumber="531">
+          <span class="hits">64</span>
           
           <code class="ruby">          block.call(:finish, channel, nil) if block</code>
         </li>
       
-        <li class="covered" data-hits="63" data-linenumber="532">
-          <span class="hits">63</span>
+        <li class="covered" data-hits="64" data-linenumber="532">
+          <span class="hits">64</span>
           
           <code class="ruby">          @result</code>
         </li>
@@ -3756,62 +3756,62 @@
           <code class="ruby">      def with_session(host, opts={}, &amp;block)</code>
         </li>
       
-        <li class="covered" data-hits="101" data-linenumber="612">
-          <span class="hits">101</span>
+        <li class="covered" data-hits="102" data-linenumber="612">
+          <span class="hits">102</span>
           
           <code class="ruby">        opts[:timeout] ||= 60</code>
         </li>
       
-        <li class="covered" data-hits="101" data-linenumber="613">
-          <span class="hits">101</span>
+        <li class="covered" data-hits="102" data-linenumber="613">
+          <span class="hits">102</span>
           
           <code class="ruby">        opts[:timeout] = MAX_TIMEOUT if opts[:timeout] == 0</code>
         </li>
       
-        <li class="covered" data-hits="101" data-linenumber="614">
-          <span class="hits">101</span>
+        <li class="covered" data-hits="102" data-linenumber="614">
+          <span class="hits">102</span>
           
           <code class="ruby">        opts[:operation_timeout] ||= 3600</code>
         </li>
       
-        <li class="covered" data-hits="101" data-linenumber="615">
-          <span class="hits">101</span>
+        <li class="covered" data-hits="102" data-linenumber="615">
+          <span class="hits">102</span>
           
           <code class="ruby">        opts[:operation_timeout] = MAX_TIMEOUT if opts[:operation_timeout] == 0</code>
         </li>
       
-        <li class="covered" data-hits="101" data-linenumber="616">
-          <span class="hits">101</span>
+        <li class="covered" data-hits="102" data-linenumber="616">
+          <span class="hits">102</span>
           
           <code class="ruby">        opts[:close_timeout] ||= 5</code>
         </li>
       
-        <li class="covered" data-hits="101" data-linenumber="617">
-          <span class="hits">101</span>
+        <li class="covered" data-hits="102" data-linenumber="617">
+          <span class="hits">102</span>
           
           <code class="ruby">        opts[:keepalive_interval] ||= 60</code>
         </li>
       
-        <li class="covered" data-hits="101" data-linenumber="618">
-          <span class="hits">101</span>
+        <li class="covered" data-hits="102" data-linenumber="618">
+          <span class="hits">102</span>
           
           <code class="ruby">        begin</code>
         </li>
       
-        <li class="covered" data-hits="584" data-linenumber="619">
-          <span class="hits">584</span>
+        <li class="covered" data-hits="589" data-linenumber="619">
+          <span class="hits">589</span>
           
           <code class="ruby">          net_ssh_opts = opts.reject{|k,v| EXTRA_OPTS.include? k }</code>
         </li>
       
-        <li class="covered" data-hits="101" data-linenumber="620">
-          <span class="hits">101</span>
+        <li class="covered" data-hits="102" data-linenumber="620">
+          <span class="hits">102</span>
           
           <code class="ruby">          ::Timeout.timeout(opts[:operation_timeout]) do</code>
         </li>
       
-        <li class="covered" data-hits="101" data-linenumber="621">
-          <span class="hits">101</span>
+        <li class="covered" data-hits="102" data-linenumber="621">
+          <span class="hits">102</span>
           
           <code class="ruby">            session = Thread.current[:ssh_simple_sessions][host.hash] \</code>
         </li>
@@ -3828,8 +3828,8 @@
           <code class="ruby">                   || Net::SSH.start(*[host, opts[:user], net_ssh_opts])</code>
         </li>
       
-        <li class="covered" data-hits="100" data-linenumber="624">
-          <span class="hits">100</span>
+        <li class="covered" data-hits="101" data-linenumber="624">
+          <span class="hits">101</span>
           
           <code class="ruby">            block.call(session)</code>
         </li>
@@ -3906,14 +3906,14 @@
           <code class="ruby">      def wait_for_channel(session, channel, result, opts)</code>
         </li>
       
-        <li class="covered" data-hits="100" data-linenumber="637">
-          <span class="hits">100</span>
+        <li class="covered" data-hits="101" data-linenumber="637">
+          <span class="hits">101</span>
           
           <code class="ruby">        session.loop(1) do</code>
         </li>
       
-        <li class="covered" data-hits="1857" data-linenumber="638">
-          <span class="hits">1857</span>
+        <li class="covered" data-hits="1877" data-linenumber="638">
+          <span class="hits">1877</span>
           
           <code class="ruby">          if opts[:timeout] &lt; Time.now - result[:last_event_at]</code>
         </li>
@@ -3942,20 +3942,20 @@
           <code class="ruby">          # Send keep-alive probes at the configured interval.</code>
         </li>
       
-        <li class="covered" data-hits="1856" data-linenumber="643">
-          <span class="hits">1856</span>
+        <li class="covered" data-hits="1876" data-linenumber="643">
+          <span class="hits">1876</span>
           
           <code class="ruby">          if opts[:keepalive_interval] &lt; Time.now.to_i - (@result[:last_keepalive_at]||0).to_i</code>
         </li>
       
-        <li class="covered" data-hits="103" data-linenumber="644">
-          <span class="hits">103</span>
+        <li class="covered" data-hits="104" data-linenumber="644">
+          <span class="hits">104</span>
           
           <code class="ruby">            session.send_global_request(&#39;keep-alive@openssh.com&#39;)</code>
         </li>
       
-        <li class="covered" data-hits="103" data-linenumber="645">
-          <span class="hits">103</span>
+        <li class="covered" data-hits="104" data-linenumber="645">
+          <span class="hits">104</span>
           
           <code class="ruby">            @result[:last_keepalive_at] = Time.now</code>
         </li>
@@ -3966,8 +3966,8 @@
           <code class="ruby">          end</code>
         </li>
       
-        <li class="covered" data-hits="1856" data-linenumber="647">
-          <span class="hits">1856</span>
+        <li class="covered" data-hits="1876" data-linenumber="647">
+          <span class="hits">1876</span>
           
           <code class="ruby">          channel.active?</code>
         </li>
