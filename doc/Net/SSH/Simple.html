@@ -362,25 +362,14 @@
     <dl class="constants">
       
         <dt id="MAX_TIMEOUT-constant" class="">MAX_TIMEOUT =
-          <div class="docstring">
-  <div class="discussion">
-    
-<p>set lower default timeout on 32bit ruby</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-
-</div>
+          
         </dt>
-        <dd><pre class="code"><span class='lparen'>(</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_pack'>pack</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>p</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>==</span> <span class='int'>8</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='int'>2</span><span class='op'>**</span><span class='int'>32</span> <span class='op'>:</span> <span class='int'>2</span><span class='op'>**</span><span class='int'>16</span></pre></dd>
+        <dd><pre class="code"><span class='id identifier rubyid_is_64bit_platform'>is_64bit_platform</span> <span class='op'>?</span> <span class='int'>2</span><span class='op'>**</span><span class='int'>32</span> <span class='op'>:</span> <span class='int'>2</span><span class='op'>**</span><span class='int'>16</span></pre></dd>
       
         <dt id="VERSION-constant" class="">VERSION =
           
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>1.6.18</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>1.7.0</span><span class='tstring_end'>&quot;</span></span></pre></dd>
       
     </dl>
   
@@ -2719,7 +2708,7 @@ are translated to the corresponding Logger constant.</p>
 </div>
 
     <div id="footer">
-  Generated on Fri Feb 17 14:13:14 2017 by
+  Generated on Mon Apr  3 12:14:11 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.6 (ruby-2.4.0).
 </div>
