@@ -13,10 +13,10 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '>= 1.9.2'
 
-  s.add_dependency "net-ssh", "= 4.0.1"
+  s.add_dependency "net-ssh", "= 4.1.0"
   s.add_dependency "net-scp", "= 1.2.1"
   s.add_dependency "blockenspiel", "= 0.5.0"
-  s.add_dependency "hashie", "= 3.5.3"
+  s.add_dependency "hashie", "~> 3.5.5"
 
   s.add_development_dependency "rake", "~> 10.4.2"
   s.add_development_dependency "rspec", "= 2.14.1"
