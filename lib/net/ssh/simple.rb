@@ -599,11 +599,19 @@ module Net
       end
 
       # set lower default timeout on 32bit ruby
-      MAX_TIMEOUT = ([''].pack('p').size == 8) ? 2**32 : 2**16
-      if MAX_TIMEOUT == 2**16 and $SUPPRESS_32BIT_WARNING.nil?
-        warn "WARNING: 32bit platform detected; Net::SSH::Simple timeout defaults to 65536s (~18 hours)."
-        warn "To suppress this warning set $SUPPRESS_32BIT_WARNING=1 before you require 'net/ssh/simple'."
+      is_64bit_platform = true
+      begin
+        Socket.tcp('127.0.0.1', 1, connect_timeout: 2**32).close
+      rescue Errno::EINVAL
+        is_64bit_platform = false
+      rescue
       end
+      MAX_TIMEOUT = is_64bit_platform ? 2**32 : 2**16
+
+      # if MAX_TIMEOUT == 2**16 and $SUPPRESS_32BIT_WARNING.nil?
+      #   warn "WARNING: 32bit platform detected; Net::SSH::Simple timeout defaults to 65536s (~18 hours)."
+      #   warn "To suppress this warning set $SUPPRESS_32BIT_WARNING=1 before you require 'net/ssh/simple'."
+      # end
 
       private
       EXTRA_OPTS = [:operation_timeout, :close_timeout, :keepalive_interval, :scp_src, :scp_dst]
