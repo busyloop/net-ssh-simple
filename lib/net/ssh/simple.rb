@@ -602,7 +602,7 @@ module Net
       is_64bit_platform = true
       begin
         Socket.tcp('127.0.0.1', 1, connect_timeout: 2**32).close
-      rescue Errno::EINVAL
+      rescue Errno::EINVAL, RangeError
         is_64bit_platform = false
       rescue
       end
