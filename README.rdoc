@@ -1,4 +1,4 @@
-= Net::SSH::Simple {<img src="https://gemnasium.com/busyloop/net-ssh-simple.png" alt="Dependency Status" />}[https://gemnasium.com/busyloop/net-ssh-simple] {<img src="https://badge.fury.io/rb/net-ssh-simple.svg" alt="Gem Version" />}[https://badge.fury.io/rb/net-ssh-simple]
+= Net::SSH::Simple {<img src="https://badge.fury.io/rb/net-ssh-simple.svg" alt="Gem Version" />}[https://badge.fury.io/rb/net-ssh-simple]
 
 Net::SSH::Simple is a simple wrapper around Net::SSH and Net::SCP.
 
@@ -81,7 +81,7 @@ If you want to use the instance syntax in a threaded environment
 then the following idiom will provide the best performance:
 
  require 'net/ssh/simple'
- 
+
  # Create and re-use one instance per thread, with a default username.
  def ss
    Thread.current[:simplessh] ||= Net::SSH::Simple.new({:user => 'bob'})
